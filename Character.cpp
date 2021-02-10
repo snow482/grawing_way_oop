@@ -3,6 +3,20 @@
 #include "Character.hpp"
 
 
+/*
+ * 1) выбор персонажа
+ *
+ * 2) броски инициативы (у кого бросок больше, тот первый)
+ *
+ * 3) атакующему, выбор вариантов атак, 1- баф (атака/защита), 2- верхняя атака, 3- средняя
+ *
+ * атаки - 1) баф, выбор на атаку или защиту
+ *       - 2) бросок атаки d20, если она >= armorClass'а противника = попадание = вычетание хп
+ *       - 3) блок (выбрать какую атаку блокировать) если угадал тип атаки, то урона нет и нанесение удара
+ *            легендарным действием в ответ
+ *       - 4) легендарное действие у каждого персонажа свое
+ */
+
 template<int min, int max>
 struct Dice {
     int Roll() const {
@@ -17,29 +31,10 @@ using d8 = Dice<1,8>;
 using d10 = Dice<1,10>;
 using d12 = Dice<1,12>;
 
-enum class Weapon {
-    Sword,
-    LongBow,
-    Spell
-};
-
-/*class Ranger;
-class Morozzz;*/
-
-class Ranger {
-public:
-
-
-private:
-
-
-};
-
 class Character {
 public:
-    Character(std::string& name, int hp, int armorClass, int runRange)
-    : m_name(name), m_hp(hp), m_armorClass(armorClass), m_runRange(runRange)
-    {};
+    Character(std::string &name, int hp, int armorClass, int runRange)
+            : m_name(name), m_hp(hp), m_armorClass(armorClass), m_runRange(runRange) {};
 
     int initiativeThrow() const {
         return d20_throw();
@@ -53,82 +48,77 @@ public:
         return m_armorClass;
     }
 
-    void armorBuff(int commandNumber) {
-        for(auto& it : m_defenceBuffValue){
-            if(commandNumber == it.first){
-                m_armorClass += it.second;
-            }
-        }
-    }
-
-    int attackBuff(int commandNumber) {
-        int damage = 0;
-        for(auto& it : m_attackBuffValue) {
-            if(commandNumber == it.first){
-                damage = getDamage();
-            }
-        }
-        return damage;
-    }
 
     void getDamage(int damage) {
         m_hp -= damage;
     };
 
-    void attack(Character* enemy) {
+    void attack(Character *enemy) {
         int attackThrowValue = attackThrow();
         int getArmorClassValue = getArmorClass();
 
-        if(attackThrowValue < getArmorClassValue) {
+        if (attackThrowValue < getArmorClassValue) {
             std::cout << "attack throw: " << attackThrowValue
                       << "armor class: " << getArmorClassValue << std::endl;
             return;
         }
 
+        std::cout << "Please, enter the number of action" << "\n"
+                  << "1 - Buff, 2- Top attack, 3- Damage block "
+                     "(if success, you can take extra damage to enemy by the legendary attack" << std::endl;
+
+        // код ниже перенести в тело верхнего if ????
         int commandNumber = 0;
         std::cin >> commandNumber;
 
         switch (commandNumber) {
-            case 1: buff;
-            case 2: ;
-            case 3: ;
+            case 1:
+                int defenceCounter = 0; // max = 3
+                int attackCounter = 0;  // max = 3
+                int buffType = 0;
+                std::cin >> buffType;
+                if (buffType == 1) {
+                    ++defenceCounter;
+                    if(defenceCounter <= 3) {
+                        armorBuff(defenceCounter);
+                    }
+                    else {
+                        std::cout << "full charge! " << std::endl; // больше нельзя бафаться
+                    }
+                    std::cout << "defence counter: " << defenceCounter << std::endl;
+                }
+                if(buffType == 2) {
+                    ++attackCounter;
+                    if(attackCounter <= 3) {
+                        attackBuff(attackCounter);
+                    }
+                    else {
+                        std::cout << "full charge! " << std::endl; // больше нельзя бафаться
+                    }
+                    std::cout << "attack counter: " << defenceCounter << std::endl;
+                };
+                return;
+            case 2: getDamage(enemy->damage(); // damage without buff
+            case 3:;
         }
-        getDamage(enemy->damage());
-    }
-    /*void buff(Character* enemy) {
-        armorBuff(getArmorClass());
-    }*/
 
-    /*void attack(Character* character, int attackNumber, int additionWeaponDamage) {
-        if(attackNumber == 1) { //first attack
-            m_hp -= d8{}.Roll() + additionWeaponDamage;
-        }
-        if(attackNumber == 2) { //second attack
-            m_hp -= d8{}.Roll() + additionWeaponDamage;
-        }
-        if(attackNumber == 3) { //block
-            // надо выбрать какую атаку я буду блочить и потом если заблочил, наношу атаку
-            // легендарным действием
-            m_hp -= d12{}.Roll() + d12{}.Roll();
-        }
-    };*/
+    }
 
     void run(int runingDistance) {
         int runingRangeValue = m_runRange;
-        if(m_runRange >= runingDistance) {
+        if (m_runRange >= runingDistance) {
             m_runRange -= runingDistance;
             std::cout << "running to " << runingDistance << "ft, " << "\n"
                       << "also you have " << m_runRange << "ft" << std::endl;
-        }
-        else {
+        } else {
             std::cout << "you can't run" << std::endl;
         }
     };
 
 private:
     std::string m_name;
-    int m_hp, m_armorClass,  m_runRange;
-    std::map<int, int> m_defenceBuffValue = {{1,1} ,
+    int m_hp, m_armorClass, m_runRange;
+    std::map<int, int> m_defenceBuffValue = {{1, 1},
                                              {2, 2},
                                              {3, 3}};
     std::map<int, int> m_attackBuffValue = {{1, 2},
@@ -146,6 +136,56 @@ private:
         throwValue = d20{}.Roll();
         return throwValue;
     }
+
+    void armorBuff(int counterNumber) {
+        for (auto &it : m_defenceBuffValue) {
+            if (counterNumber == it.first) {
+                m_armorClass += it.second;
+            }
+        }
+    }
+
+    int attackBuff(int counterNumber) {
+        int damage = 0;
+        for (auto &it : m_attackBuffValue) {
+            if (counterNumber == it.first) {
+                damage = getDamage(it.second);
+            }
+        }
+        return damage;
+    }
+};
+    //дописать "если бросок инициативы первого больше второго, 1ый выбирает атаку и бьет второго,
+    //затем 2ой выбирает и бьет 1го" и так до победы кого то одного
+
+void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
+    int firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
+    int secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
+    std::cout << "first player throw: " << firstPlayerInitiativeThrowValue
+              << ", second player throw: " << secondPlayerInitiativeThrowValue << std::endl;
+
+    if(firstPlayerInitiativeThrowValue > secondPlayerInitiativeThrowValue) {
+        std::cout << "first player is ATTACKER!" << std::endl;
+        firstPlayer->attack(secondPlayer);
+    }
+    else {
+        std::cout << "second player is ATTACKER!" << std::endl;
+       secondPlayer->attack(firstPlayer);
+    }
+
+
+}
+
+int main() {
+
+
+
+
+    return 0;
+}
+
+
+
 
     /*
      * как реализовать правильно баф на защиту (ведь у меня нет такого показателя, как атака),
@@ -169,36 +209,3 @@ private:
             attackBuff = player->damage() * 2;
         }
     }*/
-};
-
-void TurnQueue (Character* attacker, Character* defender) {
-
-}
-
-
-    //дописать "если бросок инициативы первого больше второго, 1ый выбирает атаку и бьет второго,
-    //затем 2ой выбирает и бьет 1го" и так до победы кого то одного
-
-void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
-    int firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
-    int secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
-    std::cout << "first player throw: " << firstPlayerInitiativeThrowValue
-              << ", second player throw: " << secondPlayerInitiativeThrowValue << std::endl;
-
-    if(firstPlayerInitiativeThrowValue > secondPlayerInitiativeThrowValue) {
-        std::cout << "first player is ATTACKER!" << std::endl;
-        firstPlayer->attack(secondPlayer);
-    }
-    else {
-        std::cout << "second player is ATTACKER!" << std::endl;
-       secondPlayer->attack(firstPlayer);
-    }
-}
-
-int main() {
-
-
-
-
-    return 0;
-}

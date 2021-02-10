@@ -212,3 +212,20 @@ int main() {
 
 
 
+/*void buff(Character* enemy) {
+    armorBuff(getArmorClass());
+}*/
+
+/*void attack(Character* character, int attackNumber, int additionWeaponDamage) {
+    if(attackNumber == 1) { //first attack
+        m_hp -= d8{}.Roll() + additionWeaponDamage;
+    }
+    if(attackNumber == 2) { //second attack
+        m_hp -= d8{}.Roll() + additionWeaponDamage;
+    }
+    if(attackNumber == 3) { //block
+        // надо выбрать какую атаку я буду блочить и потом если заблочил, наношу атаку
+        // легендарным действием
+        m_hp -= d12{}.Roll() + d12{}.Roll();
+    }
+};*/
