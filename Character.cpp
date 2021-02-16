@@ -1,5 +1,5 @@
 #include <iostream>
-#include <map>
+#include <vector>
 #include "Character.hpp"
 
 
@@ -33,21 +33,20 @@ using d12 = Dice<1,12>;
 
 class Character {
 public:
-    Character(std::string &name, int hp, int armorClass, int runRange)
-            : m_name(name), m_hp(hp), m_armorClass(armorClass), m_runRange(runRange) {};
+    Character(std::string& name, int hp, int armorClass, int speed)
+            : m_name(name), m_hp(hp), m_armorClass(armorClass), m_speed(speed) {};
 
     int initiativeThrow() const {
-        return d20_throw();
+        return d20{}.Roll();
     }
 
     int attackThrow() const {
-        return d20_throw();
+        return d20{}.Roll();
     }
 
     int getArmorClass() {
         return m_armorClass;
     }
-
 
     void getDamage(int damage) {
         m_hp -= damage;
@@ -62,7 +61,6 @@ public:
                       << "armor class: " << getArmorClassValue << std::endl;
             return;
         }
-
         std::cout << "Please, enter the number of action" << "\n"
                   << "1 - Buff, 2- Top attack, 3- Damage block "
                      "(if success, you can take extra damage to enemy by the legendary attack" << std::endl;
@@ -70,14 +68,12 @@ public:
         // код ниже перенести в тело верхнего if ????
         int commandNumber = 0;
         std::cin >> commandNumber;
-
+        int defenceCounter = 0; // max = 3
+        int attackCounter = 0;  // max = 3
         switch (commandNumber) {
             case 1:
-                int defenceCounter = 0; // max = 3
-                int attackCounter = 0;  // max = 3
-                int buffType = 0;
-                std::cin >> buffType;
-                if (buffType == 1) {
+                std::cin >> commandNumber;
+                if (commandNumber == 1) {
                     ++defenceCounter;
                     if(defenceCounter <= 3) {
                         armorBuff(defenceCounter);
@@ -87,7 +83,7 @@ public:
                     }
                     std::cout << "defence counter: " << defenceCounter << std::endl;
                 }
-                if(buffType == 2) {
+                if(commandNumber == 2) {
                     ++attackCounter;
                     if(attackCounter <= 3) {
                         attackBuff(attackCounter);
@@ -96,20 +92,26 @@ public:
                         std::cout << "full charge! " << std::endl; // больше нельзя бафаться
                     }
                     std::cout << "attack counter: " << defenceCounter << std::endl;
-                };
-                return;
-            case 2: getDamage(enemy->damage(); // damage without buff
-            case 3:;
+                }
+                break;
+            case 2: getDamage(enemy->damage()); break; // damage without buff
+            case 3: std::cin >> commandNumber;
+                switch (commandNumber) {
+                    case 1: std::cout << "top attack blocked" << std::endl; break;
+                    case 2: std::cout << "middle attack blocked" << std::endl; break;
+                    case 3: std::cout << "low attack blocked" << std::endl; break;
+                    default: getDamage(enemy->damage()); break;
+                }
+                break;
         }
-
     }
 
-    void run(int runingDistance) {
-        int runingRangeValue = m_runRange;
-        if (m_runRange >= runingDistance) {
-            m_runRange -= runingDistance;
-            std::cout << "running to " << runingDistance << "ft, " << "\n"
-                      << "also you have " << m_runRange << "ft" << std::endl;
+    void run(int distance) {
+        int characterSpeed = m_speed;
+        if (m_speed >= distance) {
+            m_speed -= distance;
+            std::cout << "running to " << distance << "ft, " << "\n"
+                      << "also you have " << m_speed << "ft" << std::endl;
         } else {
             std::cout << "you can't run" << std::endl;
         }
@@ -117,13 +119,15 @@ public:
 
 private:
     std::string m_name;
-    int m_hp, m_armorClass, m_runRange;
-    std::map<int, int> m_defenceBuffValue = {{1, 1},
-                                             {2, 2},
-                                             {3, 3}};
-    std::map<int, int> m_attackBuffValue = {{1, 2},
-                                            {2, 3},
-                                            {3, 4}};
+    int m_hp, m_armorClass, m_speed;
+    int m_damageModificator = 1;
+    std::vector<std::vector<int>> m_defenceBuffValue = {{1, 1},
+                                                        {2, 2},
+                                                        {3, 3}};
+    std::vector<std::vector<int>> m_attackBuffValue = {{1, 2},
+                                                       {2, 3},
+                                                       {3, 4}};
+
 private:
     int damage() const {
         int throwValue = 0;
@@ -131,28 +135,25 @@ private:
         return throwValue;
     }
 
-    int d20_throw() const {
-        int throwValue = 0;
-        throwValue = d20{}.Roll();
-        return throwValue;
-    }
-
     void armorBuff(int counterNumber) {
-        for (auto &it : m_defenceBuffValue) {
-            if (counterNumber == it.first) {
-                m_armorClass += it.second;
+        for(int i = 0; i < m_defenceBuffValue.size(); ++i) {
+            for(int j = 0; j < m_defenceBuffValue.size(); ++j) {
+                if(i == counterNumber) {
+                    m_armorClass += j;
+                }
             }
         }
     }
 
     int attackBuff(int counterNumber) {
         int damage = 0;
-        for (auto &it : m_attackBuffValue) {
-            if (counterNumber == it.first) {
-                damage = getDamage(it.second);
-            }
-        }
-        return damage;
+        for (int i = 0; i < m_attackBuffValue.size(); ++i)
+            for (int j = 0; j < m_attackBuffValue.size(); ++j)
+                if(i == counterNumber) {
+                    m_damageModificator = j;
+                }
+
+        return damage * m_damageModificator;
     }
 };
     //дописать "если бросок инициативы первого больше второго, 1ый выбирает атаку и бьет второго,
