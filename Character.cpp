@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
 #include "Character.hpp"
-
-
 /*
  * 1) выбор персонажа
  *
@@ -16,11 +14,12 @@
  *            легендарным действием в ответ
  *       - 4) легендарное действие у каждого персонажа свое
  */
+class Character;
 
 template<int min, int max>
 struct Dice {
     int Roll() const {
-        return rand() % (max - min) + max;
+        return rand() % (max - min) + min;
     }
 };
 
@@ -33,7 +32,7 @@ using d12 = Dice<1,12>;
 
 class Character {
 public:
-    Character(std::string& name, int hp, int armorClass, int speed)
+    Character(std::string name, int hp, int armorClass, int speed)
             : m_name(name), m_hp(hp), m_armorClass(armorClass), m_speed(speed) {};
 
     int initiativeThrow() const {
@@ -47,6 +46,9 @@ public:
     int getArmorClass() {
         return m_armorClass;
     }
+    int getHPInfo() {
+        return m_hp;
+    }
 
     void getDamage(int damage) {
         m_hp -= damage;
@@ -58,7 +60,7 @@ public:
 
         if (attackThrowValue < getArmorClassValue) {
             std::cout << "attack throw: " << attackThrowValue
-                      << "armor class: " << getArmorClassValue << std::endl;
+                      << " armor class: " << getArmorClassValue << std::endl;
             return;
         }
         std::cout << "Please, enter the number of action" << "\n"
@@ -130,9 +132,7 @@ private:
 
 private:
     int damage() const {
-        int throwValue = 0;
-        throwValue = d8{}.Roll();
-        return throwValue;
+        return d8{}.Roll();
     }
 
     void armorBuff(int counterNumber) {
@@ -152,7 +152,6 @@ private:
                 if(i == counterNumber) {
                     m_damageModificator = j;
                 }
-
         return damage * m_damageModificator;
     }
 };
@@ -171,14 +170,16 @@ void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
     }
     else {
         std::cout << "second player is ATTACKER!" << std::endl;
-       secondPlayer->attack(firstPlayer);
+        secondPlayer->attack(firstPlayer);
     }
-
-
 }
 
 int main() {
-
+    Character ranger { "x_Ubiwator123_x", 52, 14, 35};
+    Character moroz {"TheDeathMorozzz", 46, 15, 30};
+    while(ranger.getHPInfo() >= 0 && moroz.getHPInfo() >= 0) {
+        PlayersQueue(&ranger, &moroz); //&ranger - взятие адреса
+    }
 
 
 
