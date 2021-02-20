@@ -1,7 +1,10 @@
 #include <iostream>
 #include <vector>
 #include "Character.hpp"
-/*
+#include <iomanip>
+#include <algorithm>
+
+/*!
  * 1) выбор персонажа
  *
  * 2) броски инициативы (у кого бросок больше, тот первый)
@@ -14,14 +17,19 @@
  *            легендарным действием в ответ
  *       - 4) легендарное действие у каждого персонажа свое
  */
+
 class Character;
 
 template<int min, int max>
 struct Dice {
     int Roll() const {
         return rand() % (max - min) + min;
+
     }
 };
+ void Rol (){
+    rand() % 20;
+}
 
 using d20 = Dice<1,20>;
 using d4 = Dice<1,4>;
@@ -35,11 +43,11 @@ public:
     Character(std::string name, int hp, int armorClass, int speed)
             : m_name(name), m_hp(hp), m_armorClass(armorClass), m_speed(speed) {};
 
-    int initiativeThrow() const {
+    int initiativeThrow() {
         return d20{}.Roll();
     }
 
-    int attackThrow() const {
+    int attackThrow() {
         return d20{}.Roll();
     }
 
@@ -57,12 +65,9 @@ public:
         m_hp -= damage;
     };
 
-    void attack(Character *enemy) {
+    void attack(Character* enemy) {
         int attackThrowValue = attackThrow();
-        int armorClassValue = getArmorClass();
-
-        int defenceCounter = 0; // max = 3
-        int attackCounter = 0;  // max = 3
+        int armorClassValue = enemy->getArmorClass();
 
         if (attackThrowValue >= armorClassValue) {
             std::cout << "attack throw: " << attackThrowValue
@@ -72,33 +77,38 @@ public:
                       << "1 - Buff, 2- Top attack, 3- Damage block "
                          "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
             int commandNumber = 0;
+            int buffNumber = 0;
             std::cin >> commandNumber;
+
             switch (commandNumber) {
                 case 1:
-                    std::cin >> commandNumber;
-                    if (commandNumber == 1) {
-                        ++defenceCounter;
-                        if(defenceCounter <= 3) {
-                            armorBuff(defenceCounter);
-                        }
-                        else {
-                            std::cout << "full charge! " << std::endl; // больше нельзя бафаться
-                        }
-                        std::cout << "defence counter: " << defenceCounter << std::endl;
+                    std::cin >> buffNumber;
+                    switch (buffNumber) {
+                        case 1:
+                            ++m_defenceCounter;
+                            if(m_defenceCounter <= 3) {
+                                armorBuff(m_defenceCounter);
+                            }
+                            else {
+                                std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
+                            }
+                            std::cout << "defence counter: " << m_defenceCounter << std::endl;
+                            break;
+                        case 2:
+                            ++m_attackCounter;
+                            if(m_attackCounter <= 3) {
+                                attackBuff(m_attackCounter);
+                            }
+                            else {
+                                std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
+                            }
+                            std::cout << "attack counter: " << m_defenceCounter << std::endl;
+                        default: std::cout << "something goes wrong!" << std::endl;
+                            break;
                     }
-                    if(commandNumber == 2) {
-                        ++attackCounter;
-                        if(attackCounter <= 3) {
-                            attackBuff(attackCounter);
-                        }
-                        else {
-                            std::cout << "full charge! " << std::endl; // больше нельзя бафаться
-                        }
-                        std::cout << "attack counter: " << defenceCounter << std::endl;
-                    }
+
                     break;
-                case 2: getDamage(enemy->damage()); // damage without buff
-                        std::cout << "SUCCESS" << std::endl;
+                case 2: enemy->getDamage(damage()); //! damage without buff
                         break;
 
                 case 3: std::cin >> commandNumber;
@@ -131,85 +141,119 @@ public:
     };
 
 private:
-    std::string m_name;
-    int m_hp, m_armorClass, m_speed;
-    int m_damageModificator = 1;
-    std::vector<std::vector<int>> m_defenceBuffValue = {{1, 1},
-                                                        {2, 2},
-                                                        {3, 3}};
-    std::vector<std::vector<int>> m_attackBuffValue = {{1, 2},
-                                                       {2, 3},
-                                                       {3, 4}};
-
-private:
     int damage() const {
-        int damage = 0;
-        damage = d8{}.Roll();
-        std:: cout << "damage: " << damage << std::endl;
-        return damage;
-
+        int damageValue = d8{}.Roll() * m_damageModificator;
+        std::cout << "Damage: " << damageValue << std::endl;
+        return damageValue;
     }
 
     void armorBuff(int counterNumber) {
-        for(int i = 0; i < m_defenceBuffValue.size(); ++i) {
-            for(int j = 0; j < m_defenceBuffValue.size(); ++j) {
-                if(i == counterNumber) {
-                    m_armorClass += j;
-                }
-            }
+        switch (counterNumber) {
+            case 1: m_armorClass += m_defenceBuffValue[0];
+            case 2: m_armorClass += m_defenceBuffValue[1];
+            case 3: m_armorClass += m_defenceBuffValue[2];
+            default: std::cout << "please, enter the number from 1 to 3" << std::endl;
         }
     }
 
-    int attackBuff(int counterNumber) {
-        int damage = 0;
-        for (int i = 0; i < m_attackBuffValue.size(); ++i)
-            for (int j = 0; j < m_attackBuffValue.size(); ++j)
-                if(i == counterNumber) {
-                    m_damageModificator = j;
-                }
-        return damage * m_damageModificator;
+    void attackBuff(int counterNumber) {
+
+        switch (counterNumber) {
+            case 1: m_damageModificator = m_attackBuffValue[0];
+            case 2: m_damageModificator = m_attackBuffValue[1];
+            case 3: m_damageModificator = m_attackBuffValue[2];
+            default: std::cout << "please, enter the number from 1 to 3" << std::endl;
+        }
     }
+
+private:
+    std::string m_name;
+    int m_hp, m_armorClass, m_speed;
+    int m_damageModificator = 1;
+    std::vector<int> m_defenceBuffValue = {1, 1, 1};
+    std::vector<int> m_attackBuffValue = {2, 3, 4};
+
+    int m_defenceCounter = 0;
+    int m_attackCounter = 0;
+
 };
     //дописать "если бросок инициативы первого больше второго, 1ый выбирает атаку и бьет второго,
     //затем 2ой выбирает и бьет 1го" и так до победы кого то одного
 
 void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
+/*
+    int characterChoise = 0;
+    auto firstPlayerPtr = nullptr;
+
+    std::cout << "please, chose you character, 1 - Ranger, 2 - Moroz" << std::endl;
+    std::cin >> characterChoise;
+
+    if(characterChoise == 1) {
+       firstPlayerPtr = firstPlayer;
+    }
+    if(characterChoise == 2) {
+        auto cha
+    }*/
+
     int firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
     int secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
+    bool firstAttacker = false;
+    bool secondAttacker = false;
+
     std::cout << firstPlayer->getName() << " throw: " << firstPlayerInitiativeThrowValue << ","
               << secondPlayer->getName() << " throw: " << secondPlayerInitiativeThrowValue << std::endl;
+
+    if(firstPlayerInitiativeThrowValue == secondPlayerInitiativeThrowValue) {
+        std::cout << "Re-rolle" << std::endl;
+
+        firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
+        secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
+    }
     if(firstPlayerInitiativeThrowValue > secondPlayerInitiativeThrowValue) {
         std::cout << firstPlayer->getName() << " is ATTACKER!" << std::endl;
-
-        while(!(firstPlayer->getHPInfo() <= 0 && secondPlayer->getHPInfo() <= 0)) {
-            firstPlayer->attack(secondPlayer);
-            std::cout << secondPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
-
-            secondPlayer->attack(firstPlayer);
-            std::cout << firstPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
-        }
+        firstAttacker = true;
     }
-
     else {
         std::cout << secondPlayer->getName() << " is ATTACKER!" << std::endl;
+        secondAttacker = true;
+    }
 
-        while(!(firstPlayer->getHPInfo() <= 0 && secondPlayer->getHPInfo() <= 0)) {
-
-            secondPlayer->attack(firstPlayer);
-            std::cout << firstPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
-
+    while(firstPlayer->getHPInfo() > 0 && secondPlayer->getHPInfo() > 0) {
+        if(firstAttacker) {
+            std::cout << firstPlayer->getName() << " taking damage to " << secondPlayer->getName() << std::endl;
             firstPlayer->attack(secondPlayer);
-            std::cout << secondPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
 
+            std::cout << secondPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
+            std::cout << "\n";
+            std::swap(firstPlayer, secondPlayer);
+        }
+        if(secondAttacker) {
+            std::cout << secondPlayer->getName() << " taking damage to " << firstPlayer->getName() << std::endl;
+            secondPlayer->attack(firstPlayer);
+
+            std::cout << firstPlayer->getName() << " HP: " << firstPlayer->getHPInfo() << std::endl;
+            std::cout << "\n";
+            std::swap(firstPlayer, secondPlayer);
         }
     }
+    if(firstPlayer->getHPInfo() > secondPlayer->getHPInfo()) {
+        std::cout << firstPlayer->getName() << " - WIN !11!" << std::endl;
+    } else {
+        std::cout << secondPlayer->getName() << " - WIN !11!" << std::endl;
+    }
+
+    firstAttacker = false;
+    secondAttacker = false;
 }
 
+
 int main() {
+    srand(time(nullptr));
     Character ranger { "x_Ubiwator123_x", 52, 14, 35};
     Character moroz {"TheDeathMorozzz", 46, 15, 30};
-    PlayersQueue(&ranger, &moroz);          //&ranger - взятие адреса
 
+
+    PlayersQueue(&ranger, &moroz);          //! &ranger - взятие адреса
 
 
 
@@ -217,6 +261,27 @@ int main() {
 }
 
 
+/*
+                    if (buffNumber == 1) {
+                        ++m_defenceCounter;
+                        if(m_defenceCounter <= 3) {
+                            armorBuff(m_defenceCounter);
+                        }
+                        else {
+                            std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
+                        }
+                        std::cout << "defence counter: " << m_defenceCounter << std::endl;
+                    }
+                    if(buffNumber == 2) {
+                        ++m_attackCounter;
+                        if(m_attackCounter <= 3) {
+                            attackBuff(m_attackCounter);
+                        }
+                        else {
+                            std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
+                        }
+                        std::cout << "attack counter: " << m_defenceCounter << std::endl;
+                    }*/
 
 
     /*
