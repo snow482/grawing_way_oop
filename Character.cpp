@@ -61,6 +61,11 @@ public:
         return m_name;
     }
 
+    int getAttackType(int commandNumber) {
+        commandNumber = m_commandNumber;
+        return commandNumber;
+    }
+
     void getDamage(int damage) {
         m_hp -= damage;
     };
@@ -77,12 +82,17 @@ public:
                       << "1 - Buff, 2- Top attack, 3- Damage block "
                          "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
             int commandNumber = 0;
+            int commandBlock = 0;
+            int attackCommandNumber = 0;
             int buffNumber = 0;
             std::cin >> commandNumber;
 
             switch (commandNumber) {
                 case 1:
                     std::cin >> buffNumber;
+
+                    // написать тут либо цикл либо что, чтобы верный номер вводить, а не 3 (к примеру)
+                    // добавить присвоение для m_commandNumber, чтобы запоминать предыдущее значение команды атакующего
                     switch (buffNumber) {
                         case 1:
                             ++m_defenceCounter;
@@ -98,28 +108,59 @@ public:
                             ++m_attackCounter;
                             if(m_attackCounter <= 3) {
                                 attackBuff(m_attackCounter);
+                                std::cout << "attack counter: " << m_attackCounter << std::endl;
                             }
                             else {
                                 std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
                             }
-                            std::cout << "attack counter: " << m_defenceCounter << std::endl;
+                            break;
                         default: std::cout << "something goes wrong!" << std::endl;
                             break;
                     }
-
                     break;
-                case 2: enemy->getDamage(damage()); //! damage without buff
-                        break;
-
-                case 3: std::cin >> commandNumber;
-                    switch (commandNumber) {
-                        case 1: std::cout << "top attack blocked" << std::endl; break;
-                        case 2: std::cout << "middle attack blocked" << std::endl; break;
-                        case 3: std::cout << "low attack blocked" << std::endl; break;
-                        default: getDamage(enemy->damage()); break;
+                case 2: std::cin >> attackCommandNumber;
+                    std::cout << "Please, enter the number of attack which you want to block: \n"
+                             "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
+                    switch (attackCommandNumber) {
+                        case 1: enemy->getDamage(damageTop()); break;
+                        case 2: enemy->getDamage(damageMiddle()); break;
+                        case 3: enemy->getDamage(damageLow()); break;
+                        default: std::cout << "please, chose the attack number" << std::endl; break;
+                    }
+                    break;
+                case 3: std::cin >> commandBlock;
+                    switch (commandBlock) {
+                        case 1:
+                            if(commandBlock == enemy->getAttackType(attackCommandNumber)) {
+                                std::cout << "top attack blocked" << std::endl;
+                            }
+                            else {
+                                std::cout << "you block - missed" << std::endl;
+                            }
+                            break;
+                        case 2:
+                            if(commandBlock == enemy->getAttackType(attackCommandNumber)) {
+                                std::cout << "middle attack blocked" << std::endl;
+                            }
+                            else {
+                                std::cout << "you block - missed" << std::endl;
+                            }
+                            break;
+                        case 3:
+                            if(commandBlock == enemy->getAttackType(attackCommandNumber)) {
+                                std::cout << "low attack blocked"  << std::endl;
+                            }
+                            else {
+                                std::cout << "you block - missed" << std::endl;
+                            }
+                            break;
+                        default: std::cout << "You didn't block any attack" << std::endl;
+                            break;
                     }
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
+                commandNumber = 0;
+                break;
             }
         }
         else {
@@ -141,28 +182,43 @@ public:
     };
 
 private:
-    int damage() const {
+    int damageTop() const {
+        int damageValue = d10{}.Roll() * m_damageModificator;
+        std::cout << "Damage: " << damageValue << std::endl;
+        return damageValue;
+    }
+    int damageMiddle() const {
         int damageValue = d8{}.Roll() * m_damageModificator;
         std::cout << "Damage: " << damageValue << std::endl;
+        return damageValue;
+    }
+    int damageLow() const {
+        int damageValue = d4{}.Roll() * m_damageModificator;
+        std::cout << "Damage: " << damageValue << std::endl;
+        return damageValue;
+    }
+    int damageLegendary() const {
+        int damageValue = d12{}.Roll() * m_damageModificator * 2;
+        std::cout << "legendary damage: " << damageValue << std::endl;
         return damageValue;
     }
 
     void armorBuff(int counterNumber) {
         switch (counterNumber) {
-            case 1: m_armorClass += m_defenceBuffValue[0];
-            case 2: m_armorClass += m_defenceBuffValue[1];
-            case 3: m_armorClass += m_defenceBuffValue[2];
-            default: std::cout << "please, enter the number from 1 to 3" << std::endl;
+            case 1: m_armorClass += m_defenceBuffValue[0]; break;
+            case 2: m_armorClass += m_defenceBuffValue[1]; break;
+            case 3: m_armorClass += m_defenceBuffValue[2]; break;
+            default: std::cout << "please, enter the number from 1 to 3" << std::endl; break;
         }
     }
 
     void attackBuff(int counterNumber) {
 
         switch (counterNumber) {
-            case 1: m_damageModificator = m_attackBuffValue[0];
-            case 2: m_damageModificator = m_attackBuffValue[1];
-            case 3: m_damageModificator = m_attackBuffValue[2];
-            default: std::cout << "please, enter the number from 1 to 3" << std::endl;
+            case 1: m_damageModificator = m_attackBuffValue[0]; break;
+            case 2: m_damageModificator = m_attackBuffValue[1]; break;
+            case 3: m_damageModificator = m_attackBuffValue[2]; break;
+            default: std::cout << "please, enter the number from 1 to 3" << std::endl; break;
         }
     }
 
@@ -172,6 +228,8 @@ private:
     int m_damageModificator = 1;
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
+
+    int m_commandNumber = 0;
 
     int m_defenceCounter = 0;
     int m_attackCounter = 0;
