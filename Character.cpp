@@ -61,9 +61,17 @@ public:
         return m_name;
     }
 
-    int getAttackType(int commandNumber) {
-        commandNumber = m_commandNumber;
-        return commandNumber;
+    int getAttackType() {
+        return m_attackCommandNumber;
+    }
+    void setAttackType(int command) {
+        m_attackCommandNumber = command;
+    }
+    int getBlockType() {
+        return m_blockCommandNumber;
+    }
+    void setBlockType(int command) {
+        m_blockCommandNumber = command;
     }
 
     void getDamage(int damage) {
@@ -82,7 +90,7 @@ public:
                       << "1 - Buff, 2- Top attack, 3- Damage block "
                          "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
             int commandNumber = 0;
-            int commandBlock = 0;
+            int blockCommand = 0;
             int attackCommandNumber = 0;
             int buffNumber = 0;
             std::cin >> commandNumber;
@@ -119,19 +127,27 @@ public:
                     }
                     break;
                 case 2: std::cin >> attackCommandNumber;
+                    setAttackType(attackCommandNumber);
                     std::cout << "Please, enter the number of attack which you want to block: \n"
                              "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
-                    switch (attackCommandNumber) {
-                        case 1: enemy->getDamage(damageTop()); break;
-                        case 2: enemy->getDamage(damageMiddle()); break;
-                        case 3: enemy->getDamage(damageLow()); break;
-                        default: std::cout << "please, chose the attack number" << std::endl; break;
+                    if(attackCommandNumber != enemy->getBlockType()) {
+                        switch (attackCommandNumber) {
+                            case 1: enemy->getDamage(damageTop()); break;
+                            case 2: enemy->getDamage(damageMiddle()); break;
+                            case 3: enemy->getDamage(damageLow()); break;
+                            default: std::cout << "please, chose the attack number" << std::endl; break;
+                        }
+                        break;
+                    }
+                    else {
+                        std::cout << "attack is blocked!" << std::endl;
                     }
                     break;
-                case 3: std::cin >> commandBlock;
-                    switch (commandBlock) {
+                case 3: std::cin >> blockCommand;
+                    setBlockType(blockCommand);
+                    switch (blockCommand) {
                         case 1:
-                            if(commandBlock == enemy->getAttackType(attackCommandNumber)) {
+                            if(blockCommand == enemy->getAttackType()) {
                                 std::cout << "top attack blocked" << std::endl;
                             }
                             else {
@@ -139,7 +155,7 @@ public:
                             }
                             break;
                         case 2:
-                            if(commandBlock == enemy->getAttackType(attackCommandNumber)) {
+                            if(blockCommand == enemy->getAttackType()) {
                                 std::cout << "middle attack blocked" << std::endl;
                             }
                             else {
@@ -147,7 +163,7 @@ public:
                             }
                             break;
                         case 3:
-                            if(commandBlock == enemy->getAttackType(attackCommandNumber)) {
+                            if(blockCommand == enemy->getAttackType()) {
                                 std::cout << "low attack blocked"  << std::endl;
                             }
                             else {
@@ -159,7 +175,7 @@ public:
                     }
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
-                commandNumber = 0;
+                /*attackCommandNumber = 0;*/
                 break;
             }
         }
@@ -229,7 +245,8 @@ private:
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
-    int m_commandNumber = 0;
+    int m_attackCommandNumber = 0;
+    int m_blockCommandNumber = 0;
 
     int m_defenceCounter = 0;
     int m_attackCounter = 0;
