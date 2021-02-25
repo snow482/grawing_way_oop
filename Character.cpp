@@ -41,7 +41,8 @@ using d12 = Dice<1,12>;
 class Character {
 public:
     Character(std::string name, int hp, int armorClass, int speed)
-            : m_name(name), m_hp(hp), m_armorClass(armorClass), m_speed(speed) {};
+            : m_name(name), m_hp(hp), m_armorClass(armorClass), m_speed(speed)
+            {};
 
     int initiativeThrow() {
         return d20{}.Roll();
@@ -54,9 +55,11 @@ public:
     int getArmorClass() {
         return m_armorClass;
     }
+
     int getHPInfo() {
         return m_hp;
     }
+
     std::string getName() {
         return m_name;
     }
@@ -64,12 +67,15 @@ public:
     int getAttackType() {
         return m_attackCommandNumber;
     }
+
     void setAttackType(int command) {
         m_attackCommandNumber = command;
     }
+
     int getBlockType() {
         return m_blockCommandNumber;
     }
+
     void setBlockType(int command) {
         m_blockCommandNumber = command;
     }
@@ -87,16 +93,19 @@ public:
                       << " armor class: " << armorClassValue << std::endl;
 
             std::cout << "Please, enter the number of action" << "\n"
-                      << "1 - Buff, 2- Top attack, 3- Damage block "
+                      << "1 - Buff, 2- Attack type, 3- Damage block "
                          "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
             int commandNumber = 0;
             int blockCommand = 0;
             int attackCommandNumber = 0;
             int buffNumber = 0;
-            std::cin >> commandNumber;
 
+            std::cin >> commandNumber;
             switch (commandNumber) {
                 case 1:
+                    std::cout << "Please, enter the number of buff which you want to use: \n"
+                                 "1 - defence buff (adding 1 armor class score per level, max: 3), \n "
+                                 "2 - attack buff (modificating damage modificator level, max: 3)" << std::endl;
                     std::cin >> buffNumber;
 
                     // написать тут либо цикл либо что, чтобы верный номер вводить, а не 3 (к примеру)
@@ -110,31 +119,40 @@ public:
                             else {
                                 std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
                             }
-                            std::cout << "defence counter: " << m_defenceCounter << std::endl;
+                            std::cout << "defence level: " << m_defenceCounter << std::endl;
                             break;
                         case 2:
                             ++m_attackCounter;
                             if(m_attackCounter <= 3) {
                                 attackBuff(m_attackCounter);
-                                std::cout << "attack counter: " << m_attackCounter << std::endl;
                             }
                             else {
                                 std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
                             }
+                            std::cout << "attack level: " << m_attackCounter << std::endl;
                             break;
                         default: std::cout << "something goes wrong!" << std::endl;
                             break;
                     }
                     break;
-                case 2: std::cin >> attackCommandNumber;
+                case 2:
+                    std::cout << "Please, enter the number of attack which you want to use: \n"
+                                 "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
+                    std::cin >> attackCommandNumber;
                     setAttackType(attackCommandNumber);
-                    std::cout << "Please, enter the number of attack which you want to block: \n"
-                             "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
+
                     if(attackCommandNumber != enemy->getBlockType()) {
                         switch (attackCommandNumber) {
-                            case 1: enemy->getDamage(damageTop()); break;
-                            case 2: enemy->getDamage(damageMiddle()); break;
-                            case 3: enemy->getDamage(damageLow()); break;
+                            case 1: enemy->getDamage(damageTop());
+                            topAttackFlag;
+                            /*! остановился тут, сменить флаги на int и доделать block часть */
+                            break;
+                            case 2: enemy->getDamage(damageMiddle());
+                            middleAttackFlag = true;
+                            break;
+                            case 3: enemy->getDamage(damageLow());
+                            lowAttackFlag = true;
+                            break;
                             default: std::cout << "please, chose the attack number" << std::endl; break;
                         }
                         break;
@@ -142,40 +160,62 @@ public:
                     else {
                         std::cout << "attack is blocked!" << std::endl;
                     }
+
                     break;
-                case 3: std::cin >> blockCommand;
+                case 3:
+                    std::cout << "Please, enter the number of attack which you want to block: \n"
+                                 "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
+                    std::cin >> blockCommand;
                     setBlockType(blockCommand);
-                    switch (blockCommand) {
-                        case 1:
-                            if(blockCommand == enemy->getAttackType()) {
-                                std::cout << "top attack blocked" << std::endl;
-                            }
-                            else {
-                                std::cout << "you block - missed" << std::endl;
-                            }
-                            break;
-                        case 2:
-                            if(blockCommand == enemy->getAttackType()) {
-                                std::cout << "middle attack blocked" << std::endl;
-                            }
-                            else {
-                                std::cout << "you block - missed" << std::endl;
-                            }
-                            break;
-                        case 3:
-                            if(blockCommand == enemy->getAttackType()) {
-                                std::cout << "low attack blocked"  << std::endl;
-                            }
-                            else {
-                                std::cout << "you block - missed" << std::endl;
-                            }
-                            break;
-                        default: std::cout << "You didn't block any attack" << std::endl;
-                            break;
+                    if(blockCommand == enemy->getAttackType()) {
+
                     }
+
+                        switch (blockCommand) {
+                            case 1:
+                                if(topAttackFlag == blockCommand) {
+                                    std::cout << "top attack blocked" << std::endl;
+                                }
+                                if(topAttackFlag != blockCommand) {
+                                    std::cout << "no attacks registered yet" << std::endl;
+                                }
+                                else {
+                                    std::cout << "you block - missed" << std::endl;
+                                }
+                                break;
+                            case 2:
+                                if(blockCommand == enemy->getAttackType() || middleAttackFlag) {
+                                    std::cout << "middle attack blocked" << std::endl;
+                                }
+                                if(blockCommand == enemy->getAttackType() || !middleAttackFlag) {
+                                    std::cout << "no attacks registered yet" << std::endl;
+                                }
+                                else {
+                                    std::cout << "you block - missed" << std::endl;
+                                }
+                                break;
+                            case 3:
+                                if(blockCommand == enemy->getAttackType() || lowAttackFlag) {
+                                    std::cout << "low attack blocked"  << std::endl;
+                                }
+                                if(blockCommand == enemy->getAttackType() || !lowAttackFlag) {
+                                    std::cout << "no attacks registered yet" << std::endl;
+                                }
+                                else {
+                                    std::cout << "you block - missed" << std::endl;
+                                }
+                                break;
+                            default: std::cout << "You didn't block any attack" << std::endl;
+                                break;
+
+                    }
+
+                    /*setAttackType(0);
+                    setBlockType(0);*/
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
-                /*attackCommandNumber = 0;*/
+
+
                 break;
             }
         }
@@ -245,15 +285,16 @@ private:
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
+    int topAttackFlag = 0;
+    int middleAttackFlag = 0;
+    int lowAttackFlag = 0;
+
     int m_attackCommandNumber = 0;
     int m_blockCommandNumber = 0;
 
     int m_defenceCounter = 0;
     int m_attackCounter = 0;
-
 };
-    //дописать "если бросок инициативы первого больше второго, 1ый выбирает атаку и бьет второго,
-    //затем 2ой выбирает и бьет 1го" и так до победы кого то одного
 
 void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
 /*
@@ -320,7 +361,6 @@ void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
     firstAttacker = false;
     secondAttacker = false;
 }
-
 
 int main() {
     srand(time(nullptr));
