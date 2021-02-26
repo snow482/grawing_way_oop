@@ -72,6 +72,27 @@ public:
         m_attackCommandNumber = command;
     }
 
+    void setAttackFlags (int command) {
+        if(command == 1) {
+            topAttackFlag = command;
+        }
+        if(command == 2) {
+            middleAttackFlag = command;
+        }
+        if(command == 3) {
+            lowAttackFlag = command;
+        }
+    }
+
+    int getAttackFlags(int command) {
+        if(command == topAttackFlag)
+            return topAttackFlag;
+        if(command == middleAttackFlag)
+            return middleAttackFlag;
+        if(command == middleAttackFlag)
+            return lowAttackFlag;
+    }
+
     int getBlockType() {
         return m_blockCommandNumber;
     }
@@ -104,12 +125,10 @@ public:
             switch (commandNumber) {
                 case 1:
                     std::cout << "Please, enter the number of buff which you want to use: \n"
-                                 "1 - defence buff (adding 1 armor class score per level, max: 3), \n "
-                                 "2 - attack buff (modificating damage modificator level, max: 3)" << std::endl;
+                                 "1 - defence buff (adding 1 armor class score per level, max: 3)\n"
+                                 "2 - attack buff (modify damage modificator level, max: 3)" << std::endl;
                     std::cin >> buffNumber;
 
-                    // написать тут либо цикл либо что, чтобы верный номер вводить, а не 3 (к примеру)
-                    // добавить присвоение для m_commandNumber, чтобы запоминать предыдущее значение команды атакующего
                     switch (buffNumber) {
                         case 1:
                             ++m_defenceCounter;
@@ -144,14 +163,10 @@ public:
                     if(attackCommandNumber != enemy->getBlockType()) {
                         switch (attackCommandNumber) {
                             case 1: enemy->getDamage(damageTop());
-                            topAttackFlag;
-                            /*! остановился тут, сменить флаги на int и доделать block часть */
                             break;
                             case 2: enemy->getDamage(damageMiddle());
-                            middleAttackFlag = true;
                             break;
                             case 3: enemy->getDamage(damageLow());
-                            lowAttackFlag = true;
                             break;
                             default: std::cout << "please, chose the attack number" << std::endl; break;
                         }
@@ -167,55 +182,27 @@ public:
                                  "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
                     std::cin >> blockCommand;
                     setBlockType(blockCommand);
+
                     if(blockCommand == enemy->getAttackType()) {
-
-                    }
-
-                        switch (blockCommand) {
-                            case 1:
-                                if(topAttackFlag == blockCommand) {
-                                    std::cout << "top attack blocked" << std::endl;
-                                }
-                                if(topAttackFlag != blockCommand) {
-                                    std::cout << "no attacks registered yet" << std::endl;
-                                }
-                                else {
-                                    std::cout << "you block - missed" << std::endl;
-                                }
+                        switch (enemy->getAttackType()) {
+                            case 1: std::cout << "top attack blocked" << std::endl;
                                 break;
-                            case 2:
-                                if(blockCommand == enemy->getAttackType() || middleAttackFlag) {
-                                    std::cout << "middle attack blocked" << std::endl;
-                                }
-                                if(blockCommand == enemy->getAttackType() || !middleAttackFlag) {
-                                    std::cout << "no attacks registered yet" << std::endl;
-                                }
-                                else {
-                                    std::cout << "you block - missed" << std::endl;
-                                }
+                            case 2: std::cout << "middle attack blocked" << std::endl;
                                 break;
-                            case 3:
-                                if(blockCommand == enemy->getAttackType() || lowAttackFlag) {
-                                    std::cout << "low attack blocked"  << std::endl;
-                                }
-                                if(blockCommand == enemy->getAttackType() || !lowAttackFlag) {
-                                    std::cout << "no attacks registered yet" << std::endl;
-                                }
-                                else {
-                                    std::cout << "you block - missed" << std::endl;
-                                }
+                            case 3: std::cout << "low attack blocked"  << std::endl;
                                 break;
                             default: std::cout << "You didn't block any attack" << std::endl;
                                 break;
 
+                        }
+                    }
+                    if(blockCommand != enemy->getAttackType()) {
+                        std::cout << "no attacks registered yet" << std::endl;
                     }
 
-                    /*setAttackType(0);
-                    setBlockType(0);*/
+
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
-
-
                 break;
             }
         }
@@ -224,6 +211,8 @@ public:
                       << " armor class: " << armorClassValue << std::endl;
             std::cout << "missing!" << std::endl;
         }
+        /*setAttackType(0);
+        setBlockType(0);*/
     }
 
     void run(int distance) {
