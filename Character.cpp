@@ -40,8 +40,8 @@ using d12 = Dice<1,12>;
 
 class Character {
 public:
-    Character(std::string name, int hp, int armorClass, int speed)
-            : m_name(name), m_hp(hp), m_armorClass(armorClass), m_speed(speed)
+    Character(std::string name, int hp, int armorClass)
+            : m_name(name), m_hp(hp), m_armorClass(armorClass)
             {};
 
     int initiativeThrow() {
@@ -159,6 +159,7 @@ public:
                                  "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
                     std::cin >> attackCommandNumber;
                     setAttackType(attackCommandNumber);
+                    //m_attackType = attackCommandNumber;
 
                     if(attackCommandNumber != enemy->getBlockType()) {
                         switch (attackCommandNumber) {
@@ -182,6 +183,8 @@ public:
                                  "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
                     std::cin >> blockCommand;
                     setBlockType(blockCommand);
+                    //m_blockType = blockCommand
+                    //enemy->m_blockType = blockCommand
 
                     if(blockCommand == enemy->getAttackType()) {
                         switch (enemy->getAttackType()) {
@@ -193,14 +196,11 @@ public:
                                 break;
                             default: std::cout << "You didn't block any attack" << std::endl;
                                 break;
-
                         }
                     }
                     if(blockCommand != enemy->getAttackType()) {
                         std::cout << "no attacks registered yet" << std::endl;
                     }
-
-
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
                 break;
@@ -353,17 +353,13 @@ void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
 
 int main() {
     srand(time(nullptr));
-    Character ranger { "x_Ubiwator123_x", 52, 14, 35};
-    Character moroz {"TheDeathMorozzz", 46, 15, 30};
-
+    Character ranger { "x_Ubiwator123_x", 52, 14};
+    Character moroz {"TheDeathMorozzz", 46, 15};
 
     PlayersQueue(&ranger, &moroz);          //! &ranger - взятие адреса
 
-
-
     return 0;
 }
-
 
 /*
                     if (buffNumber == 1) {
