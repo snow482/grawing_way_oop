@@ -68,11 +68,7 @@ public:
         return m_attackCommandNumber;
     }
 
-    void setAttackType(int command) {
-        m_attackCommandNumber = command;
-    }
-
-    void setAttackFlags (int command) {
+    /*void setAttackFlags (int command) {
         if(command == 1) {
             topAttackFlag = command;
         }
@@ -82,24 +78,25 @@ public:
         if(command == 3) {
             lowAttackFlag = command;
         }
-    }
+    }*/
 
-    int getAttackFlags(int command) {
+    /*int getAttackFlags(int command) {
         if(command == topAttackFlag)
             return topAttackFlag;
         if(command == middleAttackFlag)
             return middleAttackFlag;
         if(command == middleAttackFlag)
             return lowAttackFlag;
+    }*/
+
+    void setBlockType(int command) {
+        m_blockCommandNumber = command;
     }
 
     int getBlockType() {
         return m_blockCommandNumber;
     }
 
-    void setBlockType(int command) {
-        m_blockCommandNumber = command;
-    }
 
     void getDamage(int damage) {
         m_hp -= damage;
@@ -109,7 +106,12 @@ public:
         int attackThrowValue = attackThrow();
         int armorClassValue = enemy->getArmorClass();
 
-        if (attackThrowValue >= armorClassValue) {
+        if (attackThrowValue < armorClassValue) {
+            std::cout << "attack throw: " << attackThrowValue
+                      << " armor class: " << armorClassValue << std::endl;
+            std::cout << "missing!" << std::endl;
+        }
+        else if (attackThrowValue >= armorClassValue) {
             std::cout << "attack throw: " << attackThrowValue
                       << " armor class: " << armorClassValue << std::endl;
 
@@ -151,15 +153,13 @@ public:
                             std::cout << "attack level: " << m_attackCounter << std::endl;
                             break;
                         default: std::cout << "something goes wrong!" << std::endl;
-                            break;
                     }
                     break;
                 case 2:
                     std::cout << "Please, enter the number of attack which you want to use: \n"
                                  "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
                     std::cin >> attackCommandNumber;
-                    setAttackType(attackCommandNumber);
-                    //m_attackType = attackCommandNumber;
+                    m_attackCommandNumber = attackCommandNumber;
 
                     if(attackCommandNumber != enemy->getBlockType()) {
                         switch (attackCommandNumber) {
@@ -169,7 +169,7 @@ public:
                             break;
                             case 3: enemy->getDamage(damageLow());
                             break;
-                            default: std::cout << "please, chose the attack number" << std::endl; break;
+                            default: std::cout << "please, chose the attack number" << std::endl;
                         }
                         break;
                     }
@@ -183,48 +183,33 @@ public:
                                  "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
                     std::cin >> blockCommand;
                     setBlockType(blockCommand);
-                    //m_blockType = blockCommand
+
+                    //enemy->setBlockType(blockCommand);
                     //enemy->m_blockType = blockCommand
 
-                    if(blockCommand == enemy->getAttackType()) {
-                        switch (enemy->getAttackType()) {
+                    if(enemy->getBlockType() == getAttackType()) {
+                        switch (getAttackType()) {
                             case 1: std::cout << "top attack blocked" << std::endl;
+                                setBlockType(0);
                                 break;
                             case 2: std::cout << "middle attack blocked" << std::endl;
+                                setBlockType(0);
                                 break;
                             case 3: std::cout << "low attack blocked"  << std::endl;
+                                setBlockType(0);
                                 break;
                             default: std::cout << "You didn't block any attack" << std::endl;
-                                break;
                         }
                     }
-                    if(blockCommand != enemy->getAttackType()) {
+                    if(enemy->getBlockType() != getAttackType()) {
                         std::cout << "no attacks registered yet" << std::endl;
                     }
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
-                break;
             }
         }
-        else {
-            std::cout << "attack throw: " << attackThrowValue
-                      << " armor class: " << armorClassValue << std::endl;
-            std::cout << "missing!" << std::endl;
-        }
-        /*setAttackType(0);
-        setBlockType(0);*/
     }
 
-    void run(int distance) {
-        int characterSpeed = m_speed;
-        if (m_speed >= distance) {
-            m_speed -= distance;
-            std::cout << "running to " << distance << "ft, " << "\n"
-                      << "also you have " << m_speed << "ft" << std::endl;
-        } else {
-            std::cout << "you can't run" << std::endl;
-        }
-    };
 
 private:
     int damageTop() const {
@@ -269,7 +254,7 @@ private:
 
 private:
     std::string m_name;
-    int m_hp, m_armorClass, m_speed;
+    int m_hp, m_armorClass;
     int m_damageModificator = 1;
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
@@ -361,27 +346,17 @@ int main() {
     return 0;
 }
 
-/*
-                    if (buffNumber == 1) {
-                        ++m_defenceCounter;
-                        if(m_defenceCounter <= 3) {
-                            armorBuff(m_defenceCounter);
-                        }
-                        else {
-                            std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
-                        }
-                        std::cout << "defence counter: " << m_defenceCounter << std::endl;
-                    }
-                    if(buffNumber == 2) {
-                        ++m_attackCounter;
-                        if(m_attackCounter <= 3) {
-                            attackBuff(m_attackCounter);
-                        }
-                        else {
-                            std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
-                        }
-                        std::cout << "attack counter: " << m_defenceCounter << std::endl;
-                    }*/
+
+/*    void run(int distance) {
+        int characterSpeed = m_speed;
+        if (m_speed >= distance) {
+            m_speed -= distance;
+            std::cout << "running to " << distance << "ft, " << "\n"
+                      << "also you have " << m_speed << "ft" << std::endl;
+        } else {
+            std::cout << "you can't run" << std::endl;
+        }
+    };*/
 
 
     /*
