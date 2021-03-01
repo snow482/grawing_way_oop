@@ -3,12 +3,11 @@
 #include "Character.hpp"
 #include <iomanip>
 #include <algorithm>
+#include <memory>
 
 /*!
  * 1) выбор персонажа
- *
  * 2) броски инициативы (у кого бросок больше, тот первый)
- *
  * 3) атакующему, выбор вариантов атак, 1- баф (атака/защита), 2- верхняя атака, 3- средняя
  *
  * атаки - 1) баф, выбор на атаку или защиту
@@ -68,27 +67,6 @@ public:
         return m_attackCommandNumber;
     }
 
-    /*void setAttackFlags (int command) {
-        if(command == 1) {
-            topAttackFlag = command;
-        }
-        if(command == 2) {
-            middleAttackFlag = command;
-        }
-        if(command == 3) {
-            lowAttackFlag = command;
-        }
-    }*/
-
-    /*int getAttackFlags(int command) {
-        if(command == topAttackFlag)
-            return topAttackFlag;
-        if(command == middleAttackFlag)
-            return middleAttackFlag;
-        if(command == middleAttackFlag)
-            return lowAttackFlag;
-    }*/
-
     void setBlockType(int command) {
         m_blockCommandNumber = command;
     }
@@ -102,7 +80,7 @@ public:
         m_hp -= damage;
     };
 
-    void attack(Character* enemy) {
+    void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
         int attackThrowValue = attackThrow();
         int armorClassValue = enemy->getArmorClass();
 
@@ -110,8 +88,9 @@ public:
             std::cout << "attack throw: " << attackThrowValue
                       << " armor class: " << armorClassValue << std::endl;
             std::cout << "missing!" << std::endl;
+            return;
         }
-        else if (attackThrowValue >= armorClassValue) {
+
             std::cout << "attack throw: " << attackThrowValue
                       << " armor class: " << armorClassValue << std::endl;
 
@@ -188,7 +167,7 @@ public:
                     //enemy->m_blockType = blockCommand
 
                     if(enemy->getBlockType() == getAttackType()) {
-                        switch (getAttackType()) {
+                        switch (getBlockType()) {
                             case 1: std::cout << "top attack blocked" << std::endl;
                                 setBlockType(0);
                                 break;
@@ -202,12 +181,12 @@ public:
                         }
                     }
                     if(enemy->getBlockType() != getAttackType()) {
-                        std::cout << "no attacks registered yet" << std::endl;
+                        std::cout << "attacks aren't registered yet" << std::endl;
                     }
                     break;
                 default: std::cout << "something goes wrong!" << std::endl;
             }
-        }
+
     }
 
 
@@ -259,10 +238,6 @@ private:
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
-    int topAttackFlag = 0;
-    int middleAttackFlag = 0;
-    int lowAttackFlag = 0;
-
     int m_attackCommandNumber = 0;
     int m_blockCommandNumber = 0;
 
@@ -270,20 +245,15 @@ private:
     int m_attackCounter = 0;
 };
 
-void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
-/*
+void PlayersQueue (std::shared_ptr<Character> firstPlayer,
+                   std::shared_ptr<Character> secondPlayer
+                   /*! Character* firstPlayer, Character* secondPlayer */) {
     int characterChoise = 0;
-    auto firstPlayerPtr = nullptr;
 
-    std::cout << "please, chose you character, 1 - Ranger, 2 - Moroz" << std::endl;
+    std::cout << "Hello! \n"
+                 "Pleace, pick the character and write the number: "
+                 "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
     std::cin >> characterChoise;
-
-    if(characterChoise == 1) {
-       firstPlayerPtr = firstPlayer;
-    }
-    if(characterChoise == 2) {
-        auto cha
-    }*/
 
     int firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
     int secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
@@ -312,6 +282,7 @@ void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
         if(firstAttacker) {
             std::cout << firstPlayer->getName() << " taking damage to " << secondPlayer->getName() << std::endl;
             firstPlayer->attack(secondPlayer);
+                /*! via operator new - attack(Character*)   */
 
             std::cout << secondPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
             std::cout << "\n";
@@ -320,6 +291,7 @@ void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
         if(secondAttacker) {
             std::cout << secondPlayer->getName() << " taking damage to " << firstPlayer->getName() << std::endl;
             secondPlayer->attack(firstPlayer);
+                /*! via operator new - attack(Character*)   */
 
             std::cout << firstPlayer->getName() << " HP: " << firstPlayer->getHPInfo() << std::endl;
             std::cout << "\n";
@@ -336,12 +308,42 @@ void PlayersQueue (Character* firstPlayer, Character* secondPlayer) {
     secondAttacker = false;
 }
 
+/*! Character* characterPick (int variant) {
+        std::cout << "Hello! Pleace, pick the character and write the number: "
+                     "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
+
+        if(variant == 1) {
+            return new Character {"x_Ubiwator123_x", 52, 14};
+        }
+        if(variant == 2) {
+            return new Character {"TheDeathMorozzz", 46, 15};
+        }
+        else {
+            std::cout << "please, chose 1 or 2" << std::endl;
+        }
+    }*/
+
+
+
+std::shared_ptr<Character> pickCharacter (int variant) {
+
+    if(variant == 1)
+        return std::make_shared<Character>("x_Ubiwator123_x", 52, 14);
+    if(variant == 2)
+        return std::make_shared<Character>("TheDeathMorozzz", 46, 15);
+}
+
+
+
+
 int main() {
     srand(time(nullptr));
-    Character ranger { "x_Ubiwator123_x", 52, 14};
-    Character moroz {"TheDeathMorozzz", 46, 15};
+    /*! auto ranger = characterPick(1);
+        auto moroz = characterPick(2);  */
+    auto ranger = pickCharacter(1);
+    auto moroz = pickCharacter(2);
 
-    PlayersQueue(&ranger, &moroz);          //! &ranger - взятие адреса
+    PlayersQueue(ranger, moroz);          //! &ranger - взятие адреса
 
     return 0;
 }
