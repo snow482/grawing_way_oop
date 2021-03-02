@@ -75,7 +75,6 @@ public:
         return m_blockCommandNumber;
     }
 
-
     void getDamage(int damage) {
         m_hp -= damage;
     };
@@ -96,7 +95,12 @@ public:
     void countIncrement (int counter) {
         ++counter;
         if  (counter <= 3) {
-            armorBuff(counter);
+            switch (counter) {
+                case 1: m_armorClass += m_defenceBuffValue[0]; break;
+                case 2: m_armorClass += m_defenceBuffValue[1]; break;
+                case 3: m_armorClass += m_defenceBuffValue[2]; break;
+                default: std::cout << "please, enter the number from 1 to 3" << std::endl;
+            }
         }
         else {
             std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
@@ -104,7 +108,7 @@ public:
         std::cout << "counter level: " << counter << std::endl;
     }
 
-    void action (int modificator, std::shared_ptr<Character>& ptrType) {
+    void action (int modificator, std::shared_ptr<Character> ptrType) {
         if  (modificator != ptrType->m_blockCommandNumber) {
             switch (modificator) {
                 case 1: ptrType->getDamage(damageTop());
@@ -133,11 +137,9 @@ public:
         else {
             std::cout << "attack is blocked!" << std::endl;
         }
-
     }
 
-
-    void attack(std::shared_ptr<Character>& enemy /*!Character* enemy*/) {
+    void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
         throws(attackThrow(), enemy->getArmorClass());
 
         std::cout << "Please, enter the number of action" << "\n"
@@ -150,7 +152,6 @@ public:
                   << "1- Attack type, 2- Buff type, 3- Damage block \n"
                      "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
 
-
         int commandNumber = 0;
         int attackCommand = 0;
         int buffNumber = 0;
@@ -161,16 +162,18 @@ public:
          * 1 атака, 2 бафф, 3 защита
          * персонажу, что ходит первым, дается выбор атаки, бафа,
          * вариант, какую атаку он хотел бы заблокировать
-         *
-         *
-         * */
+         */
 
         std::cin >> commandNumber >> attackCommand >> blockCommand;
         m_attackCommandNumber = attackCommand;
         m_blockCommandNumber = blockCommand;
 
+        /*std::cin >> commandNumber >> enemy->m_attackCommandNumber >> enemy->m_blockCommandNumber;*/
+
+
+
         if(commandNumber == 1) {
-            action(m_attackCommandNumber, enemy->m_blockCommandNumber, enemy->getBlockType());
+            action(m_attackCommandNumber, enemy);
         }
         if (buffNumber == 2) {
             std::cin >> buffType;
@@ -187,7 +190,7 @@ public:
         if (commandNumber == 3) {
             std::cout << "Please, enter the number of attack which you want to use: \n"
                          "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
-            action()
+            action(0, nullptr);
         }
 
         switch (commandNumber) {
@@ -258,7 +261,6 @@ private:
     }
 
     void attackBuff(int counterNumber) {
-
         switch (counterNumber) {
             case 1: m_damageModificator = m_attackBuffValue[0]; break;
             case 2: m_damageModificator = m_attackBuffValue[1]; break;
@@ -276,6 +278,7 @@ private:
 
     int m_attackCommandNumber = 0;
     int m_blockCommandNumber = 0;
+
 
     int m_defenceCounter = 0;
     int m_attackCounter = 0;
