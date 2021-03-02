@@ -80,112 +80,148 @@ public:
         m_hp -= damage;
     };
 
-    void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
-        int attackThrowValue = attackThrow();
-        int armorClassValue = enemy->getArmorClass();
+    void throws (int attackThrowValue, int armorClassValue) {
 
         if (attackThrowValue < armorClassValue) {
             std::cout << "attack throw: " << attackThrowValue
                       << " armor class: " << armorClassValue << std::endl;
             std::cout << "missing!" << std::endl;
+
             return;
         }
+        std::cout << "attack throw: " << attackThrowValue
+                  << " armor class: " << armorClassValue << std::endl;
+    }
 
-            std::cout << "attack throw: " << attackThrowValue
-                      << " armor class: " << armorClassValue << std::endl;
+    void countIncrement (int counter) {
+        ++counter;
+        if  (counter <= 3) {
+            armorBuff(counter);
+        }
+        else {
+            std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
+        }
+        std::cout << "counter level: " << counter << std::endl;
+    }
 
-            std::cout << "Please, enter the number of action" << "\n"
-                      << "1 - Buff, 2- Attack type, 3- Damage block "
-                         "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
-            int commandNumber = 0;
-            int blockCommand = 0;
-            int attackCommandNumber = 0;
-            int buffNumber = 0;
-
-            std::cin >> commandNumber;
-            switch (commandNumber) {
-                case 1:
-                    std::cout << "Please, enter the number of buff which you want to use: \n"
-                                 "1 - defence buff (adding 1 armor class score per level, max: 3)\n"
-                                 "2 - attack buff (modify damage modificator level, max: 3)" << std::endl;
-                    std::cin >> buffNumber;
-
-                    switch (buffNumber) {
-                        case 1:
-                            ++m_defenceCounter;
-                            if(m_defenceCounter <= 3) {
-                                armorBuff(m_defenceCounter);
-                            }
-                            else {
-                                std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
-                            }
-                            std::cout << "defence level: " << m_defenceCounter << std::endl;
-                            break;
-                        case 2:
-                            ++m_attackCounter;
-                            if(m_attackCounter <= 3) {
-                                attackBuff(m_attackCounter);
-                            }
-                            else {
-                                std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
-                            }
-                            std::cout << "attack level: " << m_attackCounter << std::endl;
-                            break;
-                        default: std::cout << "something goes wrong!" << std::endl;
-                    }
-                    break;
-                case 2:
-                    std::cout << "Please, enter the number of attack which you want to use: \n"
-                                 "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
-                    std::cin >> attackCommandNumber;
-                    m_attackCommandNumber = attackCommandNumber;
-
-                    if(attackCommandNumber != enemy->getBlockType()) {
-                        switch (attackCommandNumber) {
-                            case 1: enemy->getDamage(damageTop());
-                            break;
-                            case 2: enemy->getDamage(damageMiddle());
-                            break;
-                            case 3: enemy->getDamage(damageLow());
-                            break;
-                            default: std::cout << "please, chose the attack number" << std::endl;
-                        }
-                        break;
-                    }
-                    else {
-                        std::cout << "attack is blocked!" << std::endl;
-                    }
-
-                    break;
-                case 3:
-                    std::cout << "Please, enter the number of attack which you want to block: \n"
-                                 "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
-                    std::cin >> blockCommand;
-                    setBlockType(blockCommand);
-
-                    //enemy->setBlockType(blockCommand);
-                    //enemy->m_blockType = blockCommand
-
-                    if(enemy->getBlockType() == getAttackType()) {
-                        switch (getBlockType()) {
-                            case 1: std::cout << "top attack blocked" << std::endl;
-                                setBlockType(0);
-                                break;
-                            case 2: std::cout << "middle attack blocked" << std::endl;
-                                setBlockType(0);
-                                break;
-                            case 3: std::cout << "low attack blocked"  << std::endl;
-                                setBlockType(0);
-                                break;
-                            default: std::cout << "You didn't block any attack" << std::endl;
-                        }
-                    }
-                    if(enemy->getBlockType() != getAttackType()) {
-                        std::cout << "attacks aren't registered yet" << std::endl;
-                    }
-                    break;
-                default: std::cout << "something goes wrong!" << std::endl;
+    void action (int modificator, std::shared_ptr<Character>& ptrType) {
+        if  (modificator != ptrType->m_blockCommandNumber) {
+            switch (modificator) {
+                case 1: ptrType->getDamage(damageTop());
+                break;
+                case 2: ptrType->getDamage(damageMiddle());
+                break;
+                case 3: ptrType->getDamage(damageLow());
+                break;
+                default: std::cout << "please, chose the attack number" << std::endl;
             }
+        }
+        if (modificator == ptrType->m_blockCommandNumber) {
+            switch (modificator) {
+                case 1: std::cout << "top attack blocked" << std::endl;
+                    setBlockType(0);
+                    break;
+                case 2: std::cout << "middle attack blocked" << std::endl;
+                    setBlockType(0);
+                    break;
+                case 3: std::cout << "low attack blocked"  << std::endl;
+                    setBlockType(0);
+                    break;
+                default: std::cout << "You didn't block any attack" << std::endl;
+            }
+        }
+        else {
+            std::cout << "attack is blocked!" << std::endl;
+        }
+
+    }
+
+
+    void attack(std::shared_ptr<Character>& enemy /*!Character* enemy*/) {
+        throws(attackThrow(), enemy->getArmorClass());
+
+        std::cout << "Please, enter the number of action" << "\n"
+                  << "1) Attack (1- top, 2- middle, 3- low)\n"
+                     "2) Buff (0- no buff, )\n"
+                     "3- Block \n"
+                     "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Please, enter - 0, if you don't want to buff \n"
+                  << "1- Attack type, 2- Buff type, 3- Damage block \n"
+                     "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
+
+
+        int commandNumber = 0;
+        int attackCommand = 0;
+        int buffNumber = 0;
+        int buffType = 0;
+        int blockCommand = 0;
+
+        /*!
+         * 1 атака, 2 бафф, 3 защита
+         * персонажу, что ходит первым, дается выбор атаки, бафа,
+         * вариант, какую атаку он хотел бы заблокировать
+         *
+         *
+         * */
+
+        std::cin >> commandNumber >> attackCommand >> blockCommand;
+        m_attackCommandNumber = attackCommand;
+        m_blockCommandNumber = blockCommand;
+
+        if(commandNumber == 1) {
+            action(m_attackCommandNumber, enemy->m_blockCommandNumber, enemy->getBlockType());
+        }
+        if (buffNumber == 2) {
+            std::cin >> buffType;
+            std::cout << "Please, enter the number of buff which you want to use: \n"
+                         "1 - defence buff (adding 1 armor class score per level, max: 3)\n"
+                         "2 - attack buff (modify damage modificator level, max: 3)" << std::endl;
+            if(buffType == 1) {
+                countIncrement(m_defenceCounter);
+            }
+            if(buffType == 2) {
+                countIncrement(m_attackCounter);
+            }
+        }
+        if (commandNumber == 3) {
+            std::cout << "Please, enter the number of attack which you want to use: \n"
+                         "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
+            action()
+        }
+
+        switch (commandNumber) {
+            case 1:
+            case 2:
+            case 3:
+                std::cout << "Please, enter the number of attack which you want to block: \n"
+                             "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
+                std::cin >> blockCommand;
+                setBlockType(blockCommand);
+
+                //enemy->setBlockType(blockCommand);
+                //enemy->m_blockType = blockCommand
+
+                if(enemy->getBlockType() == getAttackType()) {
+                    switch (getBlockType()) {
+                        case 1: std::cout << "top attack blocked" << std::endl;
+                            setBlockType(0);
+                            break;
+                        case 2: std::cout << "middle attack blocked" << std::endl;
+                            setBlockType(0);
+                            break;
+                        case 3: std::cout << "low attack blocked"  << std::endl;
+                            setBlockType(0);
+                            break;
+                        default: std::cout << "You didn't block any attack" << std::endl;
+                    }
+                }
+                if(enemy->getBlockType() != getAttackType()) {
+                    std::cout << "attacks aren't registered yet" << std::endl;
+                }
+                break;
+            default: std::cout << "something goes wrong!" << std::endl;
+        }
 
     }
 
@@ -323,8 +359,6 @@ void PlayersQueue (std::shared_ptr<Character> firstPlayer,
         }
     }*/
 
-
-
 std::shared_ptr<Character> pickCharacter (int variant) {
 
     if(variant == 1)
@@ -332,9 +366,6 @@ std::shared_ptr<Character> pickCharacter (int variant) {
     if(variant == 2)
         return std::make_shared<Character>("TheDeathMorozzz", 46, 15);
 }
-
-
-
 
 int main() {
     srand(time(nullptr));
@@ -347,19 +378,6 @@ int main() {
 
     return 0;
 }
-
-
-/*    void run(int distance) {
-        int characterSpeed = m_speed;
-        if (m_speed >= distance) {
-            m_speed -= distance;
-            std::cout << "running to " << distance << "ft, " << "\n"
-                      << "also you have " << m_speed << "ft" << std::endl;
-        } else {
-            std::cout << "you can't run" << std::endl;
-        }
-    };*/
-
 
     /*
      * как реализовать правильно баф на защиту (ведь у меня нет такого показателя, как атака),
