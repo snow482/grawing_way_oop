@@ -43,19 +43,19 @@ public:
             : m_name(name), m_hp(hp), m_armorClass(armorClass)
             {};
 
-    int initiativeThrow() {
+    int initiativeThrow() const {
         return d20{}.Roll();
     }
 
-    int attackThrow() {
+    int attackThrow() const {
         return d20{}.Roll();
     }
 
-    int getArmorClass() {
+    int getArmorClass() const {
         return m_armorClass;
     }
 
-    int getHPInfo() {
+    int getHPInfo() const {
         return m_hp;
     }
 
@@ -63,7 +63,7 @@ public:
         return m_name;
     }
 
-    int getAttackType() {
+    int getAttackType() const {
         return m_attackCommandNumber;
     }
 
@@ -71,7 +71,7 @@ public:
         m_blockCommandNumber = command;
     }
 
-    int getBlockType() {
+    int getBlockType() const {
         return m_blockCommandNumber;
     }
 
@@ -92,20 +92,21 @@ public:
                   << " armor class: " << armorClassValue << std::endl;
     }
 
-    void countIncrement (int counter) {
-        ++counter;
-        if  (counter <= 3) {
-            switch (counter) {
-                case 1: m_armorClass += m_defenceBuffValue[0]; break;
-                case 2: m_armorClass += m_defenceBuffValue[1]; break;
-                case 3: m_armorClass += m_defenceBuffValue[2]; break;
+    int countIncrement (int type, int counterType, std::vector<int> buffTypeValue) {
+        if  (type <= 3) {
+            switch (type) {
+                case 1: m_modificator = buffTypeValue[0]; break;
+                case 2: m_modificator = buffTypeValue[1]; break;
+                case 3: m_modificator = buffTypeValue[2]; break;
                 default: std::cout << "please, enter the number from 1 to 3" << std::endl;
             }
+            ++counterType;
         }
         else {
             std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
         }
-        std::cout << "counter level: " << counter << std::endl;
+        std::cout << "counter level: " << type << std::endl;
+        return m_modificator;
     }
 
     void action (int modificator, std::shared_ptr<Character> ptrType) {
@@ -171,20 +172,20 @@ public:
         /*std::cin >> commandNumber >> enemy->m_attackCommandNumber >> enemy->m_blockCommandNumber;*/
 
 
-
-        if(commandNumber == 1) {
+        if (commandNumber == 1) {
             action(m_attackCommandNumber, enemy);
         }
-        if (buffNumber == 2) {
-            std::cin >> buffType;
+        if (commandNumber == 2) {
             std::cout << "Please, enter the number of buff which you want to use: \n"
                          "1 - defence buff (adding 1 armor class score per level, max: 3)\n"
                          "2 - attack buff (modify damage modificator level, max: 3)" << std::endl;
+
+            std::cin >> buffType;
             if(buffType == 1) {
-                countIncrement(m_defenceCounter);
+                m_armorClass += countIncrement(buffType, m_defenceCounter, m_defenceBuffValue);
             }
             if(buffType == 2) {
-                countIncrement(m_attackCounter);
+                m_damageModificator = countIncrement(buffType, m_attackCounter, m_attackBuffValue);
             }
         }
         if (commandNumber == 3) {
@@ -256,7 +257,7 @@ private:
             case 1: m_armorClass += m_defenceBuffValue[0]; break;
             case 2: m_armorClass += m_defenceBuffValue[1]; break;
             case 3: m_armorClass += m_defenceBuffValue[2]; break;
-            default: std::cout << "please, enter the number from 1 to 3" << std::endl; break;
+            default: std::cout << "please, enter the number from 1 to 3" << std::endl;
         }
     }
 
@@ -265,7 +266,7 @@ private:
             case 1: m_damageModificator = m_attackBuffValue[0]; break;
             case 2: m_damageModificator = m_attackBuffValue[1]; break;
             case 3: m_damageModificator = m_attackBuffValue[2]; break;
-            default: std::cout << "please, enter the number from 1 to 3" << std::endl; break;
+            default: std::cout << "please, enter the number from 1 to 3" << std::endl;
         }
     }
 
@@ -273,6 +274,7 @@ private:
     std::string m_name;
     int m_hp, m_armorClass;
     int m_damageModificator = 1;
+    int m_modificator = 0;
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
