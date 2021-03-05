@@ -18,6 +18,7 @@
  */
 
 class Character;
+class Controller;
 
 template<int min, int max>
 struct Dice {
@@ -59,7 +60,7 @@ public:
         return m_hp;
     }
 
-    std::string getName() {
+    std::string getName() const {
         return m_name;
     }
 
@@ -67,7 +68,7 @@ public:
         return m_attackCommandNumber;
     }
 
-    void setBlockType(int command) {
+    void setBlockType(int command, int ) {
         m_blockCommandNumber = command;
     }
 
@@ -92,9 +93,9 @@ public:
                   << " armor class: " << armorClassValue << std::endl;
     }
 
-    int countIncrement (int type, int counterType, std::vector<int> buffTypeValue) {
-        if  (type <= 3) {
-            switch (type) {
+    int buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue) {
+        if  (commandNumber <= 3) {
+            switch (commandNumber) {
                 case 1: m_modificator = buffTypeValue[0]; break;
                 case 2: m_modificator = buffTypeValue[1]; break;
                 case 3: m_modificator = buffTypeValue[2]; break;
@@ -105,13 +106,13 @@ public:
         else {
             std::cout << "full charge! " << std::endl; //! больше нельзя бафаться
         }
-        std::cout << "counter level: " << type << std::endl;
+        std::cout << "counter level: " << commandNumber << std::endl;
         return m_modificator;
     }
 
-    void action (int modificator, std::shared_ptr<Character> ptrType) {
-        if  (modificator != ptrType->m_blockCommandNumber) {
-            switch (modificator) {
+    void action (int modifier, std::shared_ptr<Character> ptrType) {
+        if  (modifier != ptrType->m_blockCommandNumber) {
+            switch (modifier) {
                 case 1: ptrType->getDamage(damageTop());
                 break;
                 case 2: ptrType->getDamage(damageMiddle());
@@ -120,33 +121,35 @@ public:
                 break;
                 default: std::cout << "please, chose the attack number" << std::endl;
             }
+            return;
         }
-        if (modificator == ptrType->m_blockCommandNumber) {
-            switch (modificator) {
-                case 1: std::cout << "top attack blocked" << std::endl;
-                    setBlockType(0);
-                    break;
-                case 2: std::cout << "middle attack blocked" << std::endl;
-                    setBlockType(0);
-                    break;
-                case 3: std::cout << "low attack blocked"  << std::endl;
-                    setBlockType(0);
-                    break;
-                default: std::cout << "You didn't block any attack" << std::endl;
-            }
-        }
-        else {
-            std::cout << "attack is blocked!" << std::endl;
-        }
-    }
 
+        switch (modifier) {
+            case 1: std::cout << "top attack blocked" << std::endl;
+                setBlockType(0);
+                break;
+            case 2: std::cout << "middle attack blocked" << std::endl;
+                setBlockType(0);
+                break;
+            case 3: std::cout << "low attack blocked"  << std::endl;
+                setBlockType(0);
+                break;
+            default: std::cout << "You didn't block any attack" << std::endl;
+        }
+        //std::cout << "attack is blocked!" << std::endl;
+    }
+    void gettinActionInfo (int attackCommand, int blockCommand, int buffCommand = 0) {
+        if(attackCommand > 0 && attackCommand <= 3) {
+
+        }
+    };
     void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
         throws(attackThrow(), enemy->getArmorClass());
 
-        std::cout << "Please, enter the number of action" << "\n"
-                  << "1) Attack (1- top, 2- middle, 3- low)\n"
+        std::cout << "Please, enter the number of action" << " \n"
+                  << "1) Attack (1- top, 2- middle, 3- low) \n"
                      "2) Buff (0- no buff, )\n"
-                     "3- Block \n"
+                     "3- Block (1- block top, 2- block middle, 3- block low) \n"
                      "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
         std::cout << std::endl;
         std::cout << "Please, enter - 0, if you don't want to buff \n"
@@ -165,27 +168,32 @@ public:
          * вариант, какую атаку он хотел бы заблокировать
          */
 
+
+
+        //1ый игрок списывает номер атаки, номер атаки для блока
+        //затем 2ой и играется раунд
         std::cin >> commandNumber >> attackCommand >> blockCommand;
-        m_attackCommandNumber = attackCommand;
-        m_blockCommandNumber = blockCommand;
+        m_attackCommandNumberFirstPlayer = attackCommand;
+        m_blockCommandNumberFirstPlayer = blockCommand;
+        /*blockCommandSecondPl*/
+
 
         /*std::cin >> commandNumber >> enemy->m_attackCommandNumber >> enemy->m_blockCommandNumber;*/
 
-
         if (commandNumber == 1) {
-            action(m_attackCommandNumber, enemy);
+            action(m_attackCommandNumberFirstPlayer, enemy);
         }
         if (commandNumber == 2) {
             std::cout << "Please, enter the number of buff which you want to use: \n"
-                         "1 - defence buff (adding 1 armor class score per level, max: 3)\n"
-                         "2 - attack buff (modify damage modificator level, max: 3)" << std::endl;
+                         "1 - defence buff (adding 1 armor class score per level, max: 3) \n"
+                         "2 - attack buff (modify damage modifier level, max: 3)" << std::endl;
 
             std::cin >> buffType;
             if(buffType == 1) {
-                m_armorClass += countIncrement(buffType, m_defenceCounter, m_defenceBuffValue);
+                m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
             }
             if(buffType == 2) {
-                m_damageModificator = countIncrement(buffType, m_attackCounter, m_attackBuffValue);
+                m_damageModifier = buffModifier(buffType, m_attackCounter, m_attackBuffValue);
             }
         }
         if (commandNumber == 3) {
@@ -195,8 +203,6 @@ public:
         }
 
         switch (commandNumber) {
-            case 1:
-            case 2:
             case 3:
                 std::cout << "Please, enter the number of attack which you want to block: \n"
                              "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
@@ -232,22 +238,22 @@ public:
 
 private:
     int damageTop() const {
-        int damageValue = d10{}.Roll() * m_damageModificator;
+        int damageValue = d10{}.Roll() * m_damageModifier;
         std::cout << "Damage: " << damageValue << std::endl;
         return damageValue;
     }
     int damageMiddle() const {
-        int damageValue = d8{}.Roll() * m_damageModificator;
+        int damageValue = d8{}.Roll() * m_damageModifier;
         std::cout << "Damage: " << damageValue << std::endl;
         return damageValue;
     }
     int damageLow() const {
-        int damageValue = d4{}.Roll() * m_damageModificator;
+        int damageValue = d4{}.Roll() * m_damageModifier;
         std::cout << "Damage: " << damageValue << std::endl;
         return damageValue;
     }
     int damageLegendary() const {
-        int damageValue = d12{}.Roll() * m_damageModificator * 2;
+        int damageValue = d12{}.Roll() * m_damageModifier * 2;
         std::cout << "legendary damage: " << damageValue << std::endl;
         return damageValue;
     }
@@ -263,9 +269,9 @@ private:
 
     void attackBuff(int counterNumber) {
         switch (counterNumber) {
-            case 1: m_damageModificator = m_attackBuffValue[0]; break;
-            case 2: m_damageModificator = m_attackBuffValue[1]; break;
-            case 3: m_damageModificator = m_attackBuffValue[2]; break;
+            case 1: m_damageModifier = m_attackBuffValue[0]; break;
+            case 2: m_damageModifier = m_attackBuffValue[1]; break;
+            case 3: m_damageModifier = m_attackBuffValue[2]; break;
             default: std::cout << "please, enter the number from 1 to 3" << std::endl;
         }
     }
@@ -273,19 +279,24 @@ private:
 private:
     std::string m_name;
     int m_hp, m_armorClass;
-    int m_damageModificator = 1;
+    int m_damageModifier = 1;
     int m_modificator = 0;
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
-    int m_attackCommandNumber = 0;
-    int m_blockCommandNumber = 0;
+    int m_attackCommandNumberFirstPlayer = 0;
+    int m_attackCommandNumberSecondPlayer = 0;
 
+    int m_blockCommandNumberFirstPlayer = 0;
+    int m_blockCommandNumberSecondPlayer = 0;
 
     int m_defenceCounter = 0;
     int m_attackCounter = 0;
 };
 
+class Controller : Character {
+
+};
 void PlayersQueue (std::shared_ptr<Character> firstPlayer,
                    std::shared_ptr<Character> secondPlayer
                    /*! Character* firstPlayer, Character* secondPlayer */) {
@@ -350,7 +361,7 @@ void PlayersQueue (std::shared_ptr<Character> firstPlayer,
 }
 
 /*! Character* characterPick (int variant) {
-        std::cout << "Hello! Pleace, pick the character and write the number: "
+        std::cout << "Hello! Please, pick the character and write the number: "
                      "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
 
         if(variant == 1) {
@@ -371,6 +382,9 @@ std::shared_ptr<Character> pickCharacter (int variant) {
     if(variant == 2)
         return std::make_shared<Character>("TheDeathMorozzz", 46, 15);
 }
+
+
+
 
 int main() {
     srand(time(nullptr));
