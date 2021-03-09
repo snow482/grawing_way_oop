@@ -44,7 +44,7 @@ public:
             : m_name(name), m_hp(hp), m_armorClass(armorClass)
             {};
 
-    int initiativeThrow() const {
+    int initiative() const {
         return d20{}.Roll();
     }
 
@@ -80,7 +80,7 @@ public:
         m_hp -= damage;
     };
 
-    void throws (int attackThrowValue, int armorClassValue) {
+    void initiativeThrows (int attackThrowValue, int armorClassValue) {
 
         if (attackThrowValue < armorClassValue) {
             std::cout << "attack throw: " << attackThrowValue
@@ -144,7 +144,7 @@ public:
         }
     };
     void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
-        throws(attackThrow(), enemy->getArmorClass());
+        initiativeThrows(attackThrow(), enemy->getArmorClass());
 
         std::cout << "Please, enter the number of action" << " \n"
                   << "1) Attack (1- top, 2- middle, 3- low) \n"
@@ -173,6 +173,7 @@ public:
         //1ый игрок списывает номер атаки, номер атаки для блока
         //затем 2ой и играется раунд
         std::cin >> commandNumber >> attackCommand >> blockCommand;
+        std::cin >>
         m_attackCommandNumberFirstPlayer = attackCommand;
         m_blockCommandNumberFirstPlayer = blockCommand;
         /*blockCommandSecondPl*/
@@ -258,7 +259,7 @@ private:
         return damageValue;
     }
 
-    void armorBuff(int counterNumber) {
+    /*void armorBuff(int counterNumber) {
         switch (counterNumber) {
             case 1: m_armorClass += m_defenceBuffValue[0]; break;
             case 2: m_armorClass += m_defenceBuffValue[1]; break;
@@ -274,7 +275,7 @@ private:
             case 3: m_damageModifier = m_attackBuffValue[2]; break;
             default: std::cout << "please, enter the number from 1 to 3" << std::endl;
         }
-    }
+    }*/
 
 private:
     std::string m_name;
@@ -294,9 +295,19 @@ private:
     int m_attackCounter = 0;
 };
 
-class Controller : Character {
+class Controller {
+public:
+    Controller (std::shared_ptr<Character> firstPlayer, std::shared_ptr<Character> secondPlayer)
+        : m_frirstPlayer(firstPlayer), m_secondPlayer(secondPlayer)
+        {};
 
+private:
+    std::shared_ptr<Character> m_frirstPlayer;
+    std::shared_ptr<Character> m_secondPlayer;
 };
+
+
+
 void PlayersQueue (std::shared_ptr<Character> firstPlayer,
                    std::shared_ptr<Character> secondPlayer
                    /*! Character* firstPlayer, Character* secondPlayer */) {
@@ -307,8 +318,8 @@ void PlayersQueue (std::shared_ptr<Character> firstPlayer,
                  "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
     std::cin >> characterChoise;
 
-    int firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
-    int secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
+    int firstPlayerInitiativeThrowValue = firstPlayer->initiative();
+    int secondPlayerInitiativeThrowValue = secondPlayer->initiative();
     bool firstAttacker = false;
     bool secondAttacker = false;
 
@@ -318,8 +329,8 @@ void PlayersQueue (std::shared_ptr<Character> firstPlayer,
     if(firstPlayerInitiativeThrowValue == secondPlayerInitiativeThrowValue) {
         std::cout << "Re-rolle" << std::endl;
 
-        firstPlayerInitiativeThrowValue = firstPlayer->initiativeThrow();
-        secondPlayerInitiativeThrowValue = secondPlayer->initiativeThrow();
+        firstPlayerInitiativeThrowValue = firstPlayer->initiative();
+        secondPlayerInitiativeThrowValue = secondPlayer->initiative();
     }
     if(firstPlayerInitiativeThrowValue > secondPlayerInitiativeThrowValue) {
         std::cout << firstPlayer->getName() << " is ATTACKER!" << std::endl;
