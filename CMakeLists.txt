@@ -5,15 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 add_executable(grawing_way
-        #[[Character.hpp]]
-        Character.cpp
-        #[[Interfaces/IAttackThrow.hpp
-        Skill/Skill.hpp
-        Skill/Skill.cpp
-        CharacterType/Ranger.hpp
-        CharacterType/Ranger.cpp]]
-
-
-
+        Inc/Character.hpp
+        src/Character.cpp
+        Inc/Controller.hpp
+        src/Controller.cpp
+        main.cpp
         )
 
