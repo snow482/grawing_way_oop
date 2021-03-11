@@ -1,8 +1,11 @@
+#include "Inc/Controller.hpp"
 #include <iomanip>
 #include <algorithm>
 
 
 int main() {
+
+
 
     srand(time(nullptr));
     /*! auto ranger = characterPick(1);
@@ -10,7 +13,7 @@ int main() {
     auto ranger = pickCharacter(1);
     auto moroz = pickCharacter(2);
 
-    Controller (ranger, moroz);          //! &ranger - взятие адреса
+    Controller controller (ranger, moroz);          //! &ranger - взятие адреса
 
 
 

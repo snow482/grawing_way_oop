@@ -7,12 +7,23 @@ Controller::Controller (std::shared_ptr<Character> firstPlayer, std::shared_ptr<
 
 
 
-void Controller::attackTry (std::shared_ptr<Character> firstPlayer, std::shared_ptr<Character> secondPlayer) {
-    firstPlayer;
-};
+void Controller::attackTry () {
 
-void Controller::PlayersQueue (std::shared_ptr<Character> firstPlayer,
-                   std::shared_ptr<Character> secondPlayer) {
+
+
+
+}
+
+std::shared_ptr<Character> Controller::pickCharacter (int variant) {
+
+    if(variant == 1)
+        return std::make_shared<Character>("x_Ubiwator123_x", 52, 14);
+    if(variant == 2)
+        return std::make_shared<Character>("TheDeathMorozzz", 46, 15);
+
+}
+
+void Controller::PlayersQueue () {
     int characterChoise = 0;
 
     std::cout << "Hello! \n"
@@ -20,66 +31,58 @@ void Controller::PlayersQueue (std::shared_ptr<Character> firstPlayer,
                  "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
     std::cin >> characterChoise;
 
-    int firstPlayerInitiativeThrowValue = firstPlayer->initiative();
-    int secondPlayerInitiativeThrowValue = secondPlayer->initiative();
+    int firstPlayerInitiativeThrowValue = m_firstPlayer->initiative();
+    int secondPlayerInitiativeThrowValue = m_secondPlayer->initiative();
     bool firstAttacker = false;
     bool secondAttacker = false;
 
-    std::cout << firstPlayer->getName() << " throw: " << firstPlayerInitiativeThrowValue << ","
-              << secondPlayer->getName() << " throw: " << secondPlayerInitiativeThrowValue << std::endl;
+    std::cout << m_firstPlayer->getName() << " throw: " << firstPlayerInitiativeThrowValue << ","
+              << m_secondPlayer->getName() << " throw: " << secondPlayerInitiativeThrowValue << std::endl;
 
     if (firstPlayerInitiativeThrowValue == secondPlayerInitiativeThrowValue) {
         std::cout << "Re-rolle" << std::endl;
 
-        firstPlayerInitiativeThrowValue = firstPlayer->initiative();
-        secondPlayerInitiativeThrowValue = secondPlayer->initiative();
+        firstPlayerInitiativeThrowValue = m_firstPlayer->initiative();
+        secondPlayerInitiativeThrowValue = m_secondPlayer->initiative();
     }
     if (firstPlayerInitiativeThrowValue > secondPlayerInitiativeThrowValue) {
-        std::cout << firstPlayer->getName() << " is ATTACKER!" << std::endl;
+        std::cout << m_firstPlayer->getName() << " is ATTACKER!" << std::endl;
         firstAttacker = true;
     } else {
-        std::cout << secondPlayer->getName() << " is ATTACKER!" << std::endl;
+        std::cout << m_secondPlayer->getName() << " is ATTACKER!" << std::endl;
         secondAttacker = true;
     }
 
-    while (firstPlayer->getHPInfo() > 0 && secondPlayer->getHPInfo() > 0) {
+    while (m_firstPlayer->getHPInfo() > 0 && m_secondPlayer->getHPInfo() > 0) {
         if (firstAttacker) {
-            std::cout << firstPlayer->getName() << " taking damage to " << secondPlayer->getName() << std::endl;
-            firstPlayer->attack(secondPlayer);
+            std::cout << m_firstPlayer->getName() << " taking damage to " << m_secondPlayer->getName() << std::endl;
+            m_firstPlayer->attack(m_secondPlayer);
             /*! via operator new - attack(Character*)   */
 
-            std::cout << secondPlayer->getName() << " HP: " << secondPlayer->getHPInfo() << std::endl;
+            std::cout << m_secondPlayer->getName() << " HP: " << m_secondPlayer->getHPInfo() << std::endl;
             std::cout << "\n";
-            std::swap(firstPlayer, secondPlayer);
+            std::swap(m_firstPlayer, m_secondPlayer);
         }
         if (secondAttacker) {
-            std::cout << secondPlayer->getName() << " taking damage to " << firstPlayer->getName() << std::endl;
-            secondPlayer->attack(firstPlayer);
+            std::cout << m_secondPlayer->getName() << " taking damage to " << m_firstPlayer->getName() << std::endl;
+            m_secondPlayer->attack(m_firstPlayer);
             /*! via operator new - attack(Character*)   */
 
-            std::cout << firstPlayer->getName() << " HP: " << firstPlayer->getHPInfo() << std::endl;
+            std::cout << m_firstPlayer->getName() << " HP: " << m_firstPlayer->getHPInfo() << std::endl;
             std::cout << "\n";
-            std::swap(firstPlayer, secondPlayer);
+            std::swap(m_firstPlayer, m_secondPlayer);
         }
     }
-    if (firstPlayer->getHPInfo() > secondPlayer->getHPInfo()) {
-        std::cout << firstPlayer->getName() << " - WIN !11!" << std::endl;
+    if (m_firstPlayer->getHPInfo() > m_secondPlayer->getHPInfo()) {
+        std::cout << m_firstPlayer->getName() << " - WIN !11!" << std::endl;
     } else {
-        std::cout << secondPlayer->getName() << " - WIN !11!" << std::endl;
+        std::cout << m_secondPlayer->getName() << " - WIN !11!" << std::endl;
     }
 
     firstAttacker = false;
     secondAttacker = false;
 
 
-    std::shared_ptr<Character> Controller::pickCharacter (int variant) {
-
-        if(variant == 1)
-            return std::make_shared<Character>("x_Ubiwator123_x", 52, 14);
-        if(variant == 2)
-            return std::make_shared<Character>("TheDeathMorozzz", 46, 15);
-        Controller::pickCharacter()
-    }
 }
 
 

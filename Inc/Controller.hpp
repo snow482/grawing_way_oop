@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <iomanip>
 #include <algorithm>
 #include <memory>
@@ -12,11 +13,13 @@ public:
     Controller::Controller (std::shared_ptr<Character> firstPlayer,
                             std::shared_ptr<Character> secondPlayer);
 
-    void attackTry(std::shared_ptr<Character> firstPlayer,
-                   std::shared_ptr<Character> secondPlayer);
+    int actionInfo(std::queue<int> actions);
+    void attackTry();
 
-    void PlayersQueue (std::shared_ptr<Character> firstPlayer,
-                       std::shared_ptr<Character> secondPlayer);
+    void checkBuff();
+
+    void PlayersQueue ();
+
 
 private:
     std::shared_ptr<Character> pickCharacter (int variant);
