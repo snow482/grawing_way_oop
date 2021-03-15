@@ -14,10 +14,14 @@ void Controller::characterFabric() {
     std::cout << "Hello! \n"
                  "Pleace, pick the character and write the number: "
                  "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
+    std::cout << "who is first? pick you character" << std::endl;
     std::cin >> characterChoise;
     m_attacker = pickCharacter(characterChoise);
+
+    std::cout << "who is second? pick you character" << std::endl;
     std::cin >> characterChoise;
     m_deffender = pickCharacter(characterChoise);
+
 }
 
 void Controller::playersQueue () {
@@ -25,7 +29,7 @@ void Controller::playersQueue () {
     int deffenderInitiative = m_deffender->initiativeAndAttackD20Throw();
 
     std::cout << m_attacker->getName() << " throw: " << attackerInitiative << ","
-              << m_deffender->getName() << " throw: " << deffenderInitiative << std::endl;
+              << m_deffender->getName() << " throw: " << " " << deffenderInitiative << std::endl;
 
     while (attackerInitiative == deffenderInitiative) {
         std::cout << "Re-rolle" << std::endl;
@@ -42,9 +46,20 @@ void Controller::playersQueue () {
 void Controller::fight() {
     while (m_attacker->getHPInfo() > 0 && m_deffender->getHPInfo() > 0) {
         std::cout << m_attacker->getName() << " taking damage to " << m_deffender->getName() << std::endl;
+        int attackNumber = 0;
+        int blockNumber = 0;
+
+        std::cin >> attackNumber >> blockNumber;
+        m_attacker->setAttackType(attackNumber);
+        m_attacker->setBlockType(blockNumber);
+
+        //TODO добавить 2 переменные для опроса defender'a
+
         if (m_attacker->getAttackType() == m_deffender->getBlockType()) {
             std::cout << "you attack blocked" << std::endl;
-        } else {
+
+        }
+        else {
             m_attacker->attack(m_deffender);
             /*! via operator new - attack(Character*)   */
         }

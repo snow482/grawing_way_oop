@@ -51,13 +51,21 @@ std::string Character::getName() const {
 int Character::getAttackType() const {
     return m_attackCommandNumber;
 }
+void Character::setAttackType(int number) {
+    m_attackCommandNumber = number;
+}
 
 int Character::getBlockType() const {
     return m_blockCommandNumber;
 }
+void Character::setBlockType(int number) {
+    m_blockCommandNumber = number;
+}
+
 int Character::getBuffType() const {
     return m_buffType;
 }
+
 
 void Character::getDamage(int damage) {
     m_hp -= damage;

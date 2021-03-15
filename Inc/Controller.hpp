@@ -12,7 +12,6 @@ public:
 
     Controller() = default;
 
-    /*int actionInfo(std::vector<int> actionsVec);*/
     void characterFabric();
     void playersQueue ();
     void fight();

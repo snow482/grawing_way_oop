@@ -13,8 +13,11 @@ public:
     int getHPInfo() const;
     std::string getName() const;
     int getAttackType() const;
+    void setAttackType(int number);
     int getBlockType() const;
+    void setBlockType(int number);
     int getBuffType() const;
+
     void getDamage(int damage);
     void initiativeThrows (int attackThrowValue, int armorClassValue);
     int buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue);
