@@ -20,62 +20,69 @@ void Controller::characterFabric() {
 
     std::cout << "who is second? pick you character" << std::endl;
     std::cin >> characterChoise;
-    m_deffender = pickCharacter(characterChoise);
+    m_defender = pickCharacter(characterChoise);
 
 }
 
 void Controller::playersQueue () {
     int attackerInitiative = m_attacker->initiativeAndAttackD20Throw();
-    int deffenderInitiative = m_deffender->initiativeAndAttackD20Throw();
+    int deffenderInitiative = m_defender->initiativeAndAttackD20Throw();
 
     std::cout << m_attacker->getName() << " throw: " << attackerInitiative << ","
-              << m_deffender->getName() << " throw: " << " " << deffenderInitiative << std::endl;
+              << m_defender->getName() << " throw: " << " " << deffenderInitiative << std::endl;
 
     while (attackerInitiative == deffenderInitiative) {
         std::cout << "Re-rolle" << std::endl;
 
         attackerInitiative = m_attacker->initiativeAndAttackD20Throw();
-        deffenderInitiative = m_deffender->initiativeAndAttackD20Throw();
+        deffenderInitiative = m_defender->initiativeAndAttackD20Throw();
     }
     if (attackerInitiative < deffenderInitiative) {
-        std::swap(m_attacker, m_deffender);
+        std::swap(m_attacker, m_defender);
     }
     std::cout << m_attacker->getName() << " is ATTACKER!" << std::endl;
 }
 
 void Controller::fight() {
-    while (m_attacker->getHPInfo() > 0 && m_deffender->getHPInfo() > 0) {
-        std::cout << m_attacker->getName() << " taking damage to " << m_deffender->getName() << std::endl;
+    while (m_attacker->getHPInfo() > 0 && m_defender->getHPInfo() > 0) {
+        std::cout << m_attacker->getName() << " taking damage to " << m_defender->getName() << std::endl;
         int attackNumber = 0;
         int blockNumber = 0;
+        std::cout << "Attacker, please write number of attack "
+                     "and which attack you want to block" << std::endl;
 
         std::cin >> attackNumber >> blockNumber;
-        m_attacker->setAttackType(attackNumber);
-        m_attacker->setBlockType(blockNumber);
+        m_attacker->setActionType(attackNumber, m_attacker->getAttackType());
+        m_attacker->setActionType(blockNumber, m_attacker->getBlockType());
 
-        //TODO добавить 2 переменные для опроса defender'a
+        std::cout << "Defender, please write number of attack "
+                    "and which attack you want to block" << std::endl;
+        std::cin >> attackNumber >> blockNumber;
+        m_defender->setActionType(attackNumber, m_defender->getAttackType());
+        m_defender->setActionType(blockNumber, m_defender->getBlockType());
 
-        if (m_attacker->getAttackType() == m_deffender->getBlockType()) {
+
+        if (m_attacker->getAttackType() == m_defender->getBlockType()) {
             std::cout << "you attack blocked" << std::endl;
 
         }
         else {
-            m_attacker->attack(m_deffender);
+            m_attacker->attack(m_defender);
             /*! via operator new - attack(Character*)   */
         }
 
-        std::cout << m_attacker->getName() << " HP: " << m_deffender->getHPInfo() << std::endl;
-        std::cout << m_deffender->getName() << " HP: " << m_deffender->getHPInfo() << std::endl;
+        std::cout << m_attacker->getName() << " HP: " << m_defender->getHPInfo() << std::endl;
+        std::cout << m_defender->getName() << " HP: " << m_defender->getHPInfo() << std::endl;
         std::cout << "\n";
 
-        std::swap(m_attacker, m_deffender);
+        std::swap(m_attacker, m_defender);
     }
 
-    if (m_attacker->getHPInfo() > m_deffender->getHPInfo()) {
+    if (m_attacker->getHPInfo() > m_defender->getHPInfo()) {
         std::cout << m_attacker->getName() << " - WIN !11!" << std::endl;
     }
     else {
-        std::cout << m_deffender->getName() << " - WIN !11!" << std::endl;
+        std::cout << m_defender->getName() << " - WIN !11!" << std::endl;
     }
 }
 

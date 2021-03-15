@@ -22,5 +22,5 @@ private:
     int firstPlayerScores = 0;
     int secondPlayerScores = 0;
     std::shared_ptr<Character> m_attacker;
-    std::shared_ptr<Character> m_deffender;
+    std::shared_ptr<Character> m_defender;
 };

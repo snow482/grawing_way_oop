@@ -13,9 +13,9 @@ public:
     int getHPInfo() const;
     std::string getName() const;
     int getAttackType() const;
-    void setAttackType(int number);
+    void setActionType(int number, int commandType);
     int getBlockType() const;
-    void setBlockType(int number);
+    /*void setBlockType(int number, int commandType);*/
     int getBuffType() const;
 
     void getDamage(int damage);
@@ -40,8 +40,10 @@ private:
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
-    int m_attackCommandNumber = 0;
-    int m_blockCommandNumber = 0;
+    int m_attackerAttackCommandNumber = 0;
+    int m_attackerBlockCommandNumber = 0;
+    int m_defenderAttackCommand = 0;
+    int m_defenderBlockCommand = 0;
     int m_buffType = 0;
 
     int m_defenceCounter = 0;

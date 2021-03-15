@@ -49,17 +49,14 @@ std::string Character::getName() const {
 }
 
 int Character::getAttackType() const {
-    return m_attackCommandNumber;
+    return m_attackerAttackCommandNumber;
 }
-void Character::setAttackType(int number) {
-    m_attackCommandNumber = number;
+void Character::setActionType(int number, int commandType) {
+    commandType = number;
 }
 
 int Character::getBlockType() const {
-    return m_blockCommandNumber;
-}
-void Character::setBlockType(int number) {
-    m_blockCommandNumber = number;
+    return m_defenderBlockCommand;
 }
 
 int Character::getBuffType() const {
@@ -154,11 +151,11 @@ void Character::attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
      * вариант, какую атаку он хотел бы заблокировать
      */
 
-    std::cin >> m_attackCommandNumber >> m_blockCommandNumber;
-    if (m_attackCommandNumber == 1) {
-        action(m_attackCommandNumber, enemy);
+    std::cin >> m_attackerAttackCommandNumber >> m_attackerBlockCommandNumber;
+    if (m_attackerAttackCommandNumber == 1) {
+        action(m_attackerAttackCommandNumber, enemy);
     }
-    if (m_attackCommandNumber == 2) {
+    if (m_attackerAttackCommandNumber == 2) {
         std::cin >> buffType;
         if (buffType == 1) {
             m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
@@ -171,10 +168,10 @@ void Character::attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
 
 std::vector<int> Character::getActionInfo() {
     std::vector<int> vec;
-    if(m_attackCommandNumber> 0 && m_attackCommandNumber <= 2) {
-        vec.push_back(m_attackCommandNumber);
+    if(m_attackerAttackCommandNumber > 0 && m_attackerAttackCommandNumber <= 2) {
+        vec.push_back(m_attackerAttackCommandNumber);
         vec.push_back(m_buffType);
-        vec.push_back(m_blockCommandNumber);
+        vec.push_back(m_attackerBlockCommandNumber);
     }
     else {
         std::cout << "please, enter the number from 1 to 3" << std::endl;
@@ -204,9 +201,9 @@ std::vector<int> Character::getActionInfo() {
         return damageValue;
     }
 
-    /*std::cin >> commandNumber >> enemy->m_attackCommandNumber >> enemy->m_blockCommandNumber;*/
+    /*std::cin >> commandNumber >> enemy->m_attackerAttackCommandNumber >> enemy->m_attackerBlockCommandNumber;*/
     /*if (commandNumber == 1) {
-        action(m_attackCommandNumber, enemy);
+        action(m_attackerAttackCommandNumber, enemy);
     }*/
     /*std::cout << "Please, enter the number of buff which you want to use: \n"
              "1 - defence buff (adding 1 armor class score per level, max: 3) \n"
@@ -233,7 +230,7 @@ if(enemy->getBlockType() != getAttackType()) {
              "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
 
 
-/*switch (m_blockCommandNumber) {
+/*switch (m_attackerBlockCommandNumber) {
     case 3:
         std::cout << "Please, enter the number of attack which you want to block: \n"
                      "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
