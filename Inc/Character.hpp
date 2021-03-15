@@ -8,20 +8,18 @@
 class Character {
 public:
     Character(std::string name, int hp, int armorClass);
-    int initiative() const;
-    int attackThrow() const;
+    int initiativeAndAttackD20Throw() const;
     int getArmorClass() const;
     int getHPInfo() const;
     std::string getName() const;
     int getAttackType() const;
-    void setBlockType(int command);
     int getBlockType() const;
     void getDamage(int damage);
     void initiativeThrows (int attackThrowValue, int armorClassValue);
     int buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue);
-    void action (int modifier, std::shared_ptr<Character> ptrType);
-    void gettinActionInfo (int attackCommand, int blockCommand, int buffCommand = 0);
+    std::vector<int> gettinActionInfo (int attackCommand, int blockCommand, int buffCommand = 0);
     void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/);
+    void action (int modifier, std::shared_ptr<Character> ptrType);
 
 private:
     int damageTop() const;

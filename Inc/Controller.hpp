@@ -17,13 +17,16 @@ public:
     void attackTry();
 
     void checkBuff();
-
+    void setCharacter(int number);
     void PlayersQueue ();
 
 
 private:
     std::shared_ptr<Character> pickCharacter (int variant);
 private:
+    int m_ch1, m_ch2;
+    int firstPlayerScores = 0;
+    int secondPlayerScores = 0;
     std::shared_ptr<Character> m_firstPlayer;
     std::shared_ptr<Character> m_secondPlayer;
 };

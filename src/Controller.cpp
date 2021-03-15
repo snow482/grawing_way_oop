@@ -5,12 +5,7 @@ Controller::Controller (std::shared_ptr<Character> firstPlayer, std::shared_ptr<
 {};
 /*! Character* firstPlayer, Character* secondPlayer */
 
-
-
 void Controller::attackTry () {
-
-
-
 
 }
 
@@ -20,19 +15,19 @@ std::shared_ptr<Character> Controller::pickCharacter (int variant) {
         return std::make_shared<Character>("x_Ubiwator123_x", 52, 14);
     if(variant == 2)
         return std::make_shared<Character>("TheDeathMorozzz", 46, 15);
-
 }
 
 void Controller::PlayersQueue () {
     int characterChoise = 0;
-
     std::cout << "Hello! \n"
                  "Pleace, pick the character and write the number: "
                  "1 - Ranger (x_Ubiwator123_x) , 2 - Moroz (TheDeathMorozzz) " << std::endl;
     std::cin >> characterChoise;
+    m_firstPlayer = pickCharacter(characterChoise);
+    m_secondPlayer = pickCharacter(characterChoise);
 
-    int firstPlayerInitiativeThrowValue = m_firstPlayer->initiative();
-    int secondPlayerInitiativeThrowValue = m_secondPlayer->initiative();
+    int firstPlayerInitiativeThrowValue = m_firstPlayer->initiativeAndAttackD20Throw();
+    int secondPlayerInitiativeThrowValue = m_secondPlayer->initiativeAndAttackD20Throw();
     bool firstAttacker = false;
     bool secondAttacker = false;
 
@@ -42,8 +37,8 @@ void Controller::PlayersQueue () {
     if (firstPlayerInitiativeThrowValue == secondPlayerInitiativeThrowValue) {
         std::cout << "Re-rolle" << std::endl;
 
-        firstPlayerInitiativeThrowValue = m_firstPlayer->initiative();
-        secondPlayerInitiativeThrowValue = m_secondPlayer->initiative();
+        firstPlayerInitiativeThrowValue = m_firstPlayer->initiativeAndAttackD20Throw();
+        secondPlayerInitiativeThrowValue = m_secondPlayer->initiativeAndAttackD20Throw();
     }
     if (firstPlayerInitiativeThrowValue > secondPlayerInitiativeThrowValue) {
         std::cout << m_firstPlayer->getName() << " is ATTACKER!" << std::endl;
