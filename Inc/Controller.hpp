@@ -10,23 +10,18 @@
 class Controller {
 public:
 
-    Controller::Controller (std::shared_ptr<Character> firstPlayer,
-                            std::shared_ptr<Character> secondPlayer);
+    Controller() = default;
 
-    int actionInfo(std::queue<int> actions);
-    void attackTry();
-
-    void checkBuff();
-    void setCharacter(int number);
-    void PlayersQueue ();
-
+    /*int actionInfo(std::vector<int> actionsVec);*/
+    void characterFabric();
+    void playersQueue ();
+    void fight();
 
 private:
     std::shared_ptr<Character> pickCharacter (int variant);
 private:
-    int m_ch1, m_ch2;
     int firstPlayerScores = 0;
     int secondPlayerScores = 0;
-    std::shared_ptr<Character> m_firstPlayer;
-    std::shared_ptr<Character> m_secondPlayer;
+    std::shared_ptr<Character> m_attacker;
+    std::shared_ptr<Character> m_deffender;
 };

@@ -55,6 +55,9 @@ int Character::getAttackType() const {
 int Character::getBlockType() const {
     return m_blockCommandNumber;
 }
+int Character::getBuffType() const {
+    return m_buffType;
+}
 
 void Character::getDamage(int damage) {
     m_hp -= damage;
@@ -106,19 +109,19 @@ void Character::action (int modifier, std::shared_ptr<Character> ptrType) {
         return;
     }
 
-    switch (modifier) {
+    /*switch (modifier) {
         case 1: std::cout << "top attack blocked" << std::endl;
-            /*setBlockType(0);*/
+            *//*setBlockType(0);*//*
             break;
         case 2: std::cout << "middle attack blocked" << std::endl;
-            /*setBlockType(0);*/
+            *//*setBlockType(0);*//*
             break;
         case 3: std::cout << "low attack blocked"  << std::endl;
-            /*setBlockType(0);*/
+            *//*setBlockType(0);*//*
             break;
         default: std::cout << "You didn't block any attack" << std::endl;
     }
-    //std::cout << "attack is blocked!" << std::endl;
+    //std::cout << "attack is blocked!" << std::endl;*/
 }
 
 
@@ -143,32 +146,33 @@ void Character::attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
      * вариант, какую атаку он хотел бы заблокировать
      */
 
-    std::cin >> m_attackCommandNumber >> buffType >> m_blockCommandNumber;
-    action(m_attackCommandNumber, enemy);
-
-    if (buffType == 0) {
-        std::cout << "no buff" << std::endl;
-        return;
+    std::cin >> m_attackCommandNumber >> m_blockCommandNumber;
+    if (m_attackCommandNumber == 1) {
+        action(m_attackCommandNumber, enemy);
     }
-    if (buffType == 1) {
-        m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
+    if (m_attackCommandNumber == 2) {
+        std::cin >> buffType;
+        if (buffType == 1) {
+            m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
+        }
+        if (buffType == 2) {
+            m_damageModifier = buffModifier(buffType, m_attackCounter, m_attackBuffValue);
+        }
     }
-    if (buffType == 2) {
-        m_damageModifier = buffModifier(buffType, m_attackCounter, m_attackBuffValue);
-    }
-    action(0, nullptr);
 }
 
-std::vector<int> Character::gettinActionInfo (int attackCommand, int blockCommand, int buffCommand) {
+std::vector<int> Character::getActionInfo() {
     std::vector<int> vec;
-    if(attackCommand > 0 && attackCommand <= 3) {
-
+    if(m_attackCommandNumber> 0 && m_attackCommandNumber <= 2) {
+        vec.push_back(m_attackCommandNumber);
+        vec.push_back(m_buffType);
+        vec.push_back(m_blockCommandNumber);
+    }
+    else {
+        std::cout << "please, enter the number from 1 to 3" << std::endl;
     }
     return vec;
 }
-
-
-
 
 // private methods
     int Character::damageTop() const {

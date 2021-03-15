@@ -14,10 +14,11 @@ public:
     std::string getName() const;
     int getAttackType() const;
     int getBlockType() const;
+    int getBuffType() const;
     void getDamage(int damage);
     void initiativeThrows (int attackThrowValue, int armorClassValue);
     int buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue);
-    std::vector<int> gettinActionInfo (int attackCommand, int blockCommand, int buffCommand = 0);
+    std::vector<int> getActionInfo ();
     void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/);
     void action (int modifier, std::shared_ptr<Character> ptrType);
 
@@ -38,6 +39,7 @@ private:
 
     int m_attackCommandNumber = 0;
     int m_blockCommandNumber = 0;
+    int m_buffType = 0;
 
     int m_defenceCounter = 0;
     int m_attackCounter = 0;
