@@ -12,17 +12,26 @@ public:
     int getArmorClass() const;
     int getHPInfo() const;
     std::string getName() const;
-    int getAttackType() const;
     void setActionType(int number, int commandType);
-    int getBlockType() const;
+
+    int getAttackerAttackType() const;
+    void setAttackerAttackType(int number);
+    int getAttackerBlockType() const;
+    void setAttackerBlockType(int number);
+
+    int getDefenderAttackType() const;
+    void setDefenderAttackType(int number);
+    int getDefenderBlockType() const;
+    void setDefenderBlockType(int number);
+
     /*void setBlockType(int number, int commandType);*/
     int getBuffType() const;
 
     void getDamage(int damage);
-    void initiativeThrows (int attackThrowValue, int armorClassValue);
+    void infoPrinter();
+    bool attackThrows (int attackThrowValue, int armorClassValue);
     int buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue);
-    std::vector<int> getActionInfo ();
-    void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/);
+    void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/, int attackNumber);
     void action (int modifier, std::shared_ptr<Character> ptrType);
 
 private:
@@ -40,8 +49,9 @@ private:
     std::vector<int> m_defenceBuffValue = {1, 1, 1};
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
-    int m_attackerAttackCommandNumber = 0;
-    int m_attackerBlockCommandNumber = 0;
+    int m_attackerAttackCommand = 0;
+    int m_attackerBlockCommand = 0;
+
     int m_defenderAttackCommand = 0;
     int m_defenderBlockCommand = 0;
     int m_buffType = 0;

@@ -1,7 +1,7 @@
 #include "../Inc/Controller.hpp"
 
 
-std::shared_ptr<Character> Controller::pickCharacter (int variant)  {
+std::shared_ptr<Character> Controller::pickCharacter(int variant) {
 
     if(variant == 1)
         return std::make_shared<Character>("x_Ubiwator123_x", 52, 14);
@@ -24,20 +24,19 @@ void Controller::characterFabric() {
 
 }
 
-void Controller::playersQueue () {
-    int attackerInitiative = m_attacker->initiativeAndAttackD20Throw();
-    int deffenderInitiative = m_defender->initiativeAndAttackD20Throw();
-
-    std::cout << m_attacker->getName() << " throw: " << attackerInitiative << ","
-              << m_defender->getName() << " throw: " << " " << deffenderInitiative << std::endl;
-
-    while (attackerInitiative == deffenderInitiative) {
-        std::cout << "Re-rolle" << std::endl;
+void Controller::playersQueue() {
+    int attackerInitiative, defenderInitiative;
+    do {
+        std::cout << "Roll" << std::endl;
 
         attackerInitiative = m_attacker->initiativeAndAttackD20Throw();
-        deffenderInitiative = m_defender->initiativeAndAttackD20Throw();
-    }
-    if (attackerInitiative < deffenderInitiative) {
+        defenderInitiative = m_defender->initiativeAndAttackD20Throw();
+    } while (attackerInitiative == defenderInitiative);
+
+    std::cout << m_attacker->getName() << " throw: " << attackerInitiative << " ,"
+              << m_defender->getName() << " throw: " << defenderInitiative << std::endl;
+
+    if (attackerInitiative < defenderInitiative) {
         std::swap(m_attacker, m_defender);
     }
     std::cout << m_attacker->getName() << " is ATTACKER!" << std::endl;
@@ -46,32 +45,35 @@ void Controller::playersQueue () {
 void Controller::fight() {
     while (m_attacker->getHPInfo() > 0 && m_defender->getHPInfo() > 0) {
         std::cout << m_attacker->getName() << " taking damage to " << m_defender->getName() << std::endl;
-        int attackNumber = 0;
-        int blockNumber = 0;
+        int attackerAttackNumber = 0;
+        int attackerBlockNumber = 0;
+        int defenderAttackNumber = 0;
+        int defenderBlockNumber = 0;
+        m_attacker->infoPrinter();
+
         std::cout << "Attacker, please write number of attack "
                      "and which attack you want to block" << std::endl;
 
-        std::cin >> attackNumber >> blockNumber;
-        m_attacker->setActionType(attackNumber, m_attacker->getAttackType());
-        m_attacker->setActionType(blockNumber, m_attacker->getBlockType());
+        std::cin >> attackerAttackNumber >> attackerBlockNumber;
+        m_attacker->setAttackerAttackType(attackerAttackNumber);
+        m_attacker->setAttackerBlockType(attackerBlockNumber);
 
         std::cout << "Defender, please write number of attack "
                     "and which attack you want to block" << std::endl;
-        std::cin >> attackNumber >> blockNumber;
-        m_defender->setActionType(attackNumber, m_defender->getAttackType());
-        m_defender->setActionType(blockNumber, m_defender->getBlockType());
+        std::cin >> defenderAttackNumber >> defenderBlockNumber;
+        m_defender->setDefenderAttackType(defenderAttackNumber);
+        m_defender->setDefenderBlockType(defenderBlockNumber);
 
 
-        if (m_attacker->getAttackType() == m_defender->getBlockType()) {
-            std::cout << "you attack blocked" << std::endl;
-
+        if (m_attacker->getAttackerAttackType() == m_defender->getDefenderBlockType()) {
+            std::cout << m_attacker->getName() << ", you attack blocked" << std::endl;
         }
         else {
-            m_attacker->attack(m_defender);
+            m_attacker->attack(m_defender, m_attacker->getAttackerAttackType());
             /*! via operator new - attack(Character*)   */
         }
 
-        std::cout << m_attacker->getName() << " HP: " << m_defender->getHPInfo() << std::endl;
+        std::cout << m_attacker->getName() << " HP: " << m_attacker->getHPInfo() << std::endl;
         std::cout << m_defender->getName() << " HP: " << m_defender->getHPInfo() << std::endl;
         std::cout << "\n";
 

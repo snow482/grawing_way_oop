@@ -9,11 +9,10 @@
 
 class Controller {
 public:
-
     Controller() = default;
 
     void characterFabric();
-    void playersQueue ();
+    void playersQueue();
     void fight();
 
 private:

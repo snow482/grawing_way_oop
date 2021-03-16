@@ -47,41 +47,59 @@ int Character::getHPInfo() const {
 std::string Character::getName() const {
     return m_name;
 }
-
-int Character::getAttackType() const {
-    return m_attackerAttackCommandNumber;
+//-----------------------------------------------------------------//
+int Character::getAttackerAttackType() const {
+    return m_attackerAttackCommand;
 }
-void Character::setActionType(int number, int commandType) {
-    commandType = number;
+void Character::setAttackerAttackType(int number) {
+    m_attackerAttackCommand = number;
 }
 
-int Character::getBlockType() const {
+void Character::setAttackerBlockType(int number) {
+    m_attackerBlockCommand = number;
+}
+//-----------------------------------------------------------------//
+
+void Character::setDefenderAttackType(int number) {
+    m_defenderAttackCommand = number;
+}
+
+int Character::getDefenderBlockType() const {
     return m_defenderBlockCommand;
 }
 
-int Character::getBuffType() const {
-    return m_buffType;
+void Character::setDefenderBlockType(int number) {
+    m_defenderBlockCommand = number;
 }
-
+//-----------------------------------------------------------------//
 
 void Character::getDamage(int damage) {
     m_hp -= damage;
 };
 
-void Character::initiativeThrows (int attackThrowValue, int armorClassValue) {
+void Character::infoPrinter() {
+    std::cout << "\n" << "Please, enter the number of action" << " \n"
+              << "1) Attack (1- top, 2- middle, 3- low) \n"
+                 "2) Block (1- block top, 2- block middle, 3- block low) \n"
+                 "(if success, you can do contr attack the enemy by the legendary attack) \n"
+                 "3) Buff (0- no buff, 1- armor class buff, 2- attack buff)" << std::endl;
+}
+
+bool Character::attackThrows (int attackThrowValue, int armorClassValue) {
 
     if (attackThrowValue < armorClassValue) {
         std::cout << "attack throw: " << attackThrowValue
                   << " armor class: " << armorClassValue << std::endl;
         std::cout << "missing!" << std::endl;
 
-        return;
+        return false;
     }
-    std::cout << "attack throw: " << attackThrowValue
-              << " armor class: " << armorClassValue << std::endl;
+    else {
+        std::cout << "attack throw: " << attackThrowValue
+                  << " armor class: " << armorClassValue << std::endl;
+        return true;
+    }
 }
-
-
 
 int Character::buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue) {
     if  (commandNumber <= 3) {
@@ -101,82 +119,43 @@ int Character::buffModifier (int commandNumber, int counterType, std::vector<int
 }
 
 void Character::action (int modifier, std::shared_ptr<Character> ptrType) {
-    if  (modifier != ptrType->getBlockType()) {
-        switch (modifier) {
-            case 1: ptrType->getDamage(damageTop());
-                break;
-            case 2: ptrType->getDamage(damageMiddle());
-                break;
-            case 3: ptrType->getDamage(damageLow());
-                break;
-            default: std::cout << "please, chose the attack number" << std::endl;
-        }
-        return;
-    }
-
-    /*switch (modifier) {
-        case 1: std::cout << "top attack blocked" << std::endl;
-            *//*setBlockType(0);*//*
+    switch (modifier) {
+        case 1: ptrType->getDamage(damageTop());
             break;
-        case 2: std::cout << "middle attack blocked" << std::endl;
-            *//*setBlockType(0);*//*
+        case 2: ptrType->getDamage(damageMiddle());
             break;
-        case 3: std::cout << "low attack blocked"  << std::endl;
-            *//*setBlockType(0);*//*
+        case 3: ptrType->getDamage(damageLow());
             break;
-        default: std::cout << "You didn't block any attack" << std::endl;
-    }
-    //std::cout << "attack is blocked!" << std::endl;*/
-}
+        default: std::cout << "please, chose the attack number" << std::endl;
 
-
-void Character::attack(std::shared_ptr<Character> enemy /*!Character* enemy*/) {
-    initiativeThrows(initiativeAndAttackD20Throw(), enemy->getArmorClass());
-
-    std::cout << "Please, enter the number of action" << " \n"
-              << "1) Attack (1- top, 2- middle, 3- low) \n"
-                 "2) Buff (0- no buff, 1- armor class buff, 2- attack buff )\n"
-                 "3- Block (1- block top, 2- block middle, 3- block low) \n"
-                 "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Please, enter - 0, if you don't want to buff \n"
-              << "1- Attack type, 2- Buff type, 3- Damage block \n"
-                 "(if success, you can take extra damage to enemy by the legendary attack)" << std::endl;
-
-    int buffType = 0;
-
-    /*!
-     * 1 атака, 2 бафф, 3 защита
-     * персонажу, что ходит первым, дается выбор атаки, бафа,
-     * вариант, какую атаку он хотел бы заблокировать
-     */
-
-    std::cin >> m_attackerAttackCommandNumber >> m_attackerBlockCommandNumber;
-    if (m_attackerAttackCommandNumber == 1) {
-        action(m_attackerAttackCommandNumber, enemy);
-    }
-    if (m_attackerAttackCommandNumber == 2) {
-        std::cin >> buffType;
-        if (buffType == 1) {
-            m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
-        }
-        if (buffType == 2) {
-            m_damageModifier = buffModifier(buffType, m_attackCounter, m_attackBuffValue);
-        }
     }
 }
 
-std::vector<int> Character::getActionInfo() {
-    std::vector<int> vec;
-    if(m_attackerAttackCommandNumber > 0 && m_attackerAttackCommandNumber <= 2) {
-        vec.push_back(m_attackerAttackCommandNumber);
-        vec.push_back(m_buffType);
-        vec.push_back(m_attackerBlockCommandNumber);
+void Character::attack(std::shared_ptr<Character> enemy, /*!Character* enemy*/int attackNumber) {
+
+    if (attackThrows(initiativeAndAttackD20Throw(), enemy->getArmorClass())) {
+        int buffType = 0;
+
+        /*!
+         * 1 атака, 2 бафф, 3 защита
+         * персонажу, что ходит первым, дается выбор атаки, бафа,
+         * вариант, какую атаку он хотел бы заблокировать
+         */
+
+        if (attackNumber == 1) {
+            action(m_attackerAttackCommand, enemy);
+        }
+        if (attackNumber == 3) {
+            std::cout << "Enter the buff type" << std::endl;
+            std::cin >> buffType;
+            if (buffType == 1) {
+                m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
+            }
+            if (buffType == 2) {
+                m_damageModifier = buffModifier(buffType, m_attackCounter, m_attackBuffValue);
+            }
+        }
     }
-    else {
-        std::cout << "please, enter the number from 1 to 3" << std::endl;
-    }
-    return vec;
 }
 
 // private methods
@@ -200,63 +179,6 @@ std::vector<int> Character::getActionInfo() {
         std::cout << "legendary damage: " << damageValue << std::endl;
         return damageValue;
     }
-
-    /*std::cin >> commandNumber >> enemy->m_attackerAttackCommandNumber >> enemy->m_attackerBlockCommandNumber;*/
-    /*if (commandNumber == 1) {
-        action(m_attackerAttackCommandNumber, enemy);
-    }*/
-    /*std::cout << "Please, enter the number of buff which you want to use: \n"
-             "1 - defence buff (adding 1 armor class score per level, max: 3) \n"
-             "2 - attack buff (modify damage modifier level, max: 3)" << std::endl;*/
-    /*if(enemy->getBlockType() == getAttackType()) {
-    switch (getBlockType()) {
-        case 1: std::cout << "top attack blocked" << std::endl;
-            setBlockType(0);
-            break;
-        case 2: std::cout << "middle attack blocked" << std::endl;
-            setBlockType(0);
-            break;
-        case 3: std::cout << "low attack blocked"  << std::endl;
-            setBlockType(0);
-            break;
-        default: std::cout << "You didn't block any attack" << std::endl;
-    }
-}
-if(enemy->getBlockType() != getAttackType()) {
-    std::cout << "attacks aren't registered yet" << std::endl;
-}*/
-
-/*std::cout << "Please, enter the number of attack which you want to use: \n"
-             "1 - top attack, 2 - middle attack, 3 - low attack" << std::endl;
-
-
-/*switch (m_attackerBlockCommandNumber) {
-    case 3:
-        std::cout << "Please, enter the number of attack which you want to block: \n"
-                     "1 - top attack block, 2 - middle attack block, 3 - low attack block" << std::endl;
-        std::cin >> blockCommand;
-        setBlockType(blockCommand);
-
-        //enemy->setBlockType(blockCommand);
-        //enemy->m_blockType = blockCommand
-*/
-/*void armorBuff(int counterNumber) {
-    switch (counterNumber) {
-        case 1: m_armorClass += m_defenceBuffValue[0]; break;
-        case 2: m_armorClass += m_defenceBuffValue[1]; break;
-        case 3: m_armorClass += m_defenceBuffValue[2]; break;
-        default: std::cout << "please, enter the number from 1 to 3" << std::endl;
-    }
-}
-
-void attackBuff(int counterNumber) {
-    switch (counterNumber) {
-        case 1: m_damageModifier = m_attackBuffValue[0]; break;
-        case 2: m_damageModifier = m_attackBuffValue[1]; break;
-        case 3: m_damageModifier = m_attackBuffValue[2]; break;
-        default: std::cout << "please, enter the number from 1 to 3" << std::endl;
-    }
-}*/
 
 /*! Character* characterPick (int variant) {
         std::cout << "Hello! Please, pick the character and write the number: "
