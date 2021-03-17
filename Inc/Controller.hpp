@@ -20,6 +20,7 @@ private:
 private:
     int firstPlayerScores = 0;
     int secondPlayerScores = 0;
+    std::vector<std::shared_ptr<Character>> m_players = {nullptr,nullptr};
     std::shared_ptr<Character> m_attacker;
     std::shared_ptr<Character> m_defender;
 };

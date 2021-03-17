@@ -102,7 +102,7 @@ bool Character::attackThrows (int attackThrowValue, int armorClassValue) {
 }
 
 int Character::buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue) {
-    if  (commandNumber <= 3) {
+    if (commandNumber <= 3) {
         switch (commandNumber) {
             case 1: m_modificator = buffTypeValue[0]; break;
             case 2: m_modificator = buffTypeValue[1]; break;
@@ -131,10 +131,11 @@ void Character::action (int modifier, std::shared_ptr<Character> ptrType) {
     }
 }
 
+
+
 void Character::attack(std::shared_ptr<Character> enemy, /*!Character* enemy*/int attackNumber) {
 
-    if (attackThrows(initiativeAndAttackD20Throw(), enemy->getArmorClass())) {
-        int buffType = 0;
+    /*if (attackThrows(initiativeAndAttackD20Throw(), enemy->getArmorClass())) {*/
 
         /*!
          * 1 атака, 2 бафф, 3 защита
@@ -147,16 +148,20 @@ void Character::attack(std::shared_ptr<Character> enemy, /*!Character* enemy*/in
         }
         if (attackNumber == 3) {
             std::cout << "Enter the buff type" << std::endl;
-            std::cin >> buffType;
-            if (buffType == 1) {
-                m_armorClass += buffModifier(buffType, m_defenceCounter, m_defenceBuffValue);
+            std::cin >> m_buffType;
+
+            if (m_buffType == 1) {
+                m_armorClass += buffModifier(m_buffType, m_defenceCounter, m_defenceBuffValue);
             }
-            if (buffType == 2) {
-                m_damageModifier = buffModifier(buffType, m_attackCounter, m_attackBuffValue);
+            if (m_buffType == 2) {
+                m_damageModifier = buffModifier(m_buffType, m_attackCounter, m_attackBuffValue);
             }
+            std::cout << "buff up" << std:: endl;
         }
     }
-}
+/*}*/
+
+
 
 // private methods
     int Character::damageTop() const {

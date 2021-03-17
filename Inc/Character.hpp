@@ -31,6 +31,7 @@ public:
     void infoPrinter();
     bool attackThrows (int attackThrowValue, int armorClassValue);
     int buffModifier (int commandNumber, int counterType, std::vector<int> buffTypeValue);
+    int buff(int buffType, int );
     void attack(std::shared_ptr<Character> enemy /*!Character* enemy*/, int attackNumber);
     void action (int modifier, std::shared_ptr<Character> ptrType);
 
@@ -54,9 +55,11 @@ private:
 
     int m_defenderAttackCommand = 0;
     int m_defenderBlockCommand = 0;
+
     int m_buffType = 0;
 
-    int m_defenceCounter = 0;
+
     int m_attackCounter = 0;
+    int m_defenceCounter = 0;
 
 };
