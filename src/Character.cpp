@@ -142,12 +142,15 @@ void Character::attack(std::shared_ptr<Character> enemy, /*!Character* enemy*/in
          * персонажу, что ходит первым, дается выбор атаки, бафа,
          * вариант, какую атаку он хотел бы заблокировать
          */
-
+        //TODO реализовать так, чтобы опрашивало обоих игроков, про бафф, если нет бафа то - 0,
+        // если есть, то надо передать их в переменные (или контейнер) и записать 
+        //! и доделать логику в Character.cpp, чтобы бафф апался, но при этом атаки не было (просто баф и дальше ход)
         if (attackNumber == 1) {
             action(m_attackerAttackCommand, enemy);
         }
         if (attackNumber == 3) {
             std::cout << "Enter the buff type" << std::endl;
+            if(enemy)
             std::cin >> m_buffType;
 
             if (m_buffType == 1) {
@@ -157,6 +160,9 @@ void Character::attack(std::shared_ptr<Character> enemy, /*!Character* enemy*/in
                 m_damageModifier = buffModifier(m_buffType, m_attackCounter, m_attackBuffValue);
             }
             std::cout << "buff up" << std:: endl;
+        }
+        else {
+
         }
     }
 /*}*/

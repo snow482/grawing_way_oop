@@ -67,51 +67,19 @@ void Controller::fight() {
         m_defender->setDefenderAttackType(defenderAttackNumber);
         m_defender->setDefenderBlockType(defenderBlockNumber);
 
-
-        auto roll =  rand() % (4 - 1) + 1;
-
-        auto begin = 0;auto end = 1;
-
-        if(roll % 2 == 0 )
-            std::swap(begin,end);
-
-        for(auto i = 0; i < 2;++i)
-        {
-            auto attacker = m_players[begin];
-            auto defender = m_players[end];
-            if (attacker->getAttackerAttackType() == defender->getDefenderBlockType()) {
-                std::cout << m_attacker->getName() << ", you attack blocked" << std::endl;
-            }
-            else {
-                attacker->attack(defender, attacker->getAttackerAttackType());
-            }
-
-            std::cout << attacker->getName() << " HP: " << attacker->getHPInfo() << std::endl;
-            std::cout << defender->getName() << " HP: " << defender->getHPInfo() << std::endl;
-            std::cout << "\n";
-
-            std::swap(begin, end);
-        }
-
-
-
-
-
-
-
-        /*if (m_attacker->getAttackerAttackType() == m_defender->getDefenderBlockType()) {
+        if (m_attacker->getAttackerAttackType() == m_defender->getDefenderBlockType()) {
             std::cout << m_attacker->getName() << ", you attack blocked" << std::endl;
         }
         else {
             m_attacker->attack(m_defender, m_attacker->getAttackerAttackType());
-            *//*! via operator new - attack(Character*)   *//*
+            /*! via operator new - attack(Character*)   */
         }
 
         std::cout << m_attacker->getName() << " HP: " << m_attacker->getHPInfo() << std::endl;
         std::cout << m_defender->getName() << " HP: " << m_defender->getHPInfo() << std::endl;
         std::cout << "\n";
 
-        std::swap(m_attacker, m_defender);*/
+        std::swap(m_attacker, m_defender);
     }
 
     if (m_attacker->getHPInfo() > m_defender->getHPInfo()) {
