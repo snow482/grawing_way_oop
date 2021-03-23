@@ -1,3 +1,0 @@
-[submodule "gtestbuilded"]
-	path = gtestbuilded
-	url = git@gitlab.com:scanviz_team/sharedprojects/unittests/gtestbuilded.git
