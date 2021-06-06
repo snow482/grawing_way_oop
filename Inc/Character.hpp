@@ -51,10 +51,10 @@ private:
     std::vector<int> m_attackBuffValue = {2, 3, 4};
 
     int m_attackerAttackCommand = 0;
-/*
+
     int m_attackerBlockCommand = 0;
     int m_defenderAttackCommand = 0;
-*/
+
     int m_defenderBlockCommand = 0;
 
     int m_buffType = 0;
